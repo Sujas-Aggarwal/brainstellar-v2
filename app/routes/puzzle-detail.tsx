@@ -33,6 +33,8 @@ export default function PuzzleDetail({ loaderData }: { loaderData: { puzzle: typ
   const { puzzle } = loaderData;
   const { solvedPuzzles, toggleSolved, favoritePuzzles, toggleFavorite } = useUser();
   const [showSolution, setShowSolution] = useState(false);
+  const [showHint, setShowHint] = useState(false);
+  const [showAnswer, setShowAnswer] = useState(false);
   const [showComments, setShowComments] = useState(false);
   
   const isSolved = solvedPuzzles.includes(puzzle.puzzleId);
@@ -40,6 +42,24 @@ export default function PuzzleDetail({ loaderData }: { loaderData: { puzzle: typ
 
   const prevPuzzle = puzzlesData.find(p => p.puzzleId === puzzle.puzzleId - 1);
   const nextPuzzle = puzzlesData.find(p => p.puzzleId === puzzle.puzzleId + 1);
+
+  const excludedKeys = ["puzzleId", "title", "difficulty", "category", "question", "solution", "answer", "hint"];
+  const additionalFields = Object.entries(puzzle)
+    .filter(([key, value]) => !excludedKeys.includes(key) && value && typeof value === "string" && value.trim().length > 0)
+    .sort((a, b) => {
+      const order = ["followUpQuestion", "followUpAnswer", "followUpSolution", "observation", "generalization"];
+      const idxA = order.indexOf(a[0]);
+      const idxB = order.indexOf(b[0]);
+      if (idxA !== -1 && idxB !== -1) return idxA - idxB;
+      if (idxA !== -1) return -1;
+      if (idxB !== -1) return 1;
+      return a[0].localeCompare(b[0]);
+    })
+    .map(([key, value]) => ({
+      label: key.replace(/([A-Z])/g, ' $1').replace(/(\d+)/g, ' $1').replace(/^./, str => str.toUpperCase()),
+      content: value as string,
+      key
+    }));
 
   return (
     <div className="pt-24 pb-32 px-6 max-w-4xl mx-auto min-h-screen bg-[var(--bg)] text-[var(--fg)]">
@@ -97,21 +117,81 @@ export default function PuzzleDetail({ loaderData }: { loaderData: { puzzle: typ
         </article>
 
         <div className="space-y-8">
-          <button
-            onClick={() => setShowSolution(!showSolution)}
-            className={`w-full py-6 border-2 font-bold uppercase tracking-[0.3em] text-[11px] transition-all ${showSolution ? 'bg-[var(--bg)] border-[var(--fg)] text-[var(--fg)]' : 'bg-[var(--fg)] border-[var(--fg)] text-[var(--bg)] hover:opacity-90'}`}
-          >
-            {showSolution ? "Hide Revelation" : "Reveal Solution"}
-          </button>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <button
+              onClick={() => setShowHint(!showHint)}
+              className={`py-4 border-2 font-bold uppercase tracking-[0.2em] text-[10px] transition-all ${showHint ? 'bg-[var(--bg)] border-[var(--fg)] text-[var(--fg)]' : 'bg-[var(--muted)] border-[var(--border)] text-[var(--muted-fg)] hover:border-[var(--fg)] hover:text-[var(--fg)]'}`}
+            >
+              {showHint ? "Hide Hint" : "Get a Hint"}
+            </button>
+            <button
+              onClick={() => setShowAnswer(!showAnswer)}
+              className={`py-4 border-2 font-bold uppercase tracking-[0.2em] text-[10px] transition-all ${showAnswer ? 'bg-[var(--bg)] border-[var(--fg)] text-[var(--fg)]' : 'bg-[var(--muted)] border-[var(--border)] text-[var(--muted-fg)] hover:border-[var(--fg)] hover:text-[var(--fg)]'}`}
+            >
+              {showAnswer ? "Hide Answer" : "See Answer"}
+            </button>
+            <button
+              onClick={() => {
+                setShowSolution(!showSolution);
+                if (!showSolution) {
+                  setShowHint(true);
+                  setShowAnswer(true);
+                }
+              }}
+              className={`py-4 border-2 font-bold uppercase tracking-[0.2em] text-[10px] transition-all ${showSolution ? 'bg-[var(--bg)] border-[var(--fg)] text-[var(--fg)]' : 'bg-[var(--fg)] border-[var(--fg)] text-[var(--bg)] hover:opacity-90'}`}
+            >
+              {showSolution ? "Hide Solution" : "Full Revelation"}
+            </button>
+          </div>
 
-          {showSolution && (
-            <div className="p-10 border border-[var(--border)] bg-[var(--muted)]/30 prose max-w-none animate-in fade-in slide-in-from-top-4 duration-500">
-              <ReactMarkdown 
-                remarkPlugins={[remarkGfm, remarkMath]} 
-                rehypePlugins={[rehypeKatex, rehypeRaw]}
-              >
-                {puzzle.solution}
-              </ReactMarkdown>
+          {(showHint || showAnswer || showSolution) && (
+            <div className="space-y-8 animate-in fade-in slide-in-from-top-4 duration-500">
+              {showHint && puzzle.hint && (
+                <div className="p-8 border border-[var(--border)] bg-[var(--muted)]/20 italic text-sm">
+                  <h3 className="text-[9px] font-bold uppercase tracking-[0.2em] text-[var(--muted-fg)] mb-3 not-italic">Nudge</h3>
+                  <ReactMarkdown 
+                    remarkPlugins={[remarkGfm, remarkMath]} 
+                    rehypePlugins={[rehypeKatex, rehypeRaw]}
+                  >
+                    {puzzle.hint}
+                  </ReactMarkdown>
+                </div>
+              )}
+
+              {showAnswer && puzzle.answer && (
+                <div className="p-8 border border-[var(--border)] bg-[var(--bg)]">
+                  <h3 className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--muted-fg)] mb-4">Official Answer</h3>
+                  <div className="text-xl font-black tracking-tight">{puzzle.answer}</div>
+                </div>
+              )}
+
+              {showSolution && (
+                <div className="space-y-12">
+                  {puzzle.solution && (
+                    <div className="p-10 border border-[var(--border)] bg-[var(--muted)]/30 prose max-w-none">
+                      <h3 className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--muted-fg)] mb-8 border-b border-[var(--border)] pb-4">Detailed Solution</h3>
+                      <ReactMarkdown 
+                        remarkPlugins={[remarkGfm, remarkMath]} 
+                        rehypePlugins={[rehypeKatex, rehypeRaw]}
+                      >
+                        {puzzle.solution}
+                      </ReactMarkdown>
+                    </div>
+                  )}
+
+                  {additionalFields.map(field => (
+                    <div key={field.key} className="p-10 border border-[var(--border)] bg-[var(--bg)] prose max-w-none">
+                      <h3 className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--muted-fg)] mb-8 border-b border-[var(--border)] pb-4">{field.label}</h3>
+                      <ReactMarkdown 
+                        remarkPlugins={[remarkGfm, remarkMath]} 
+                        rehypePlugins={[rehypeKatex, rehypeRaw]}
+                      >
+                        {field.content}
+                      </ReactMarkdown>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           )}
         </div>
