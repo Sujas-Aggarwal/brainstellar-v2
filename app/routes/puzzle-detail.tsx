@@ -43,7 +43,7 @@ export default function PuzzleDetail({ loaderData }: { loaderData: { puzzle: typ
   const prevPuzzle = puzzlesData.find(p => p.puzzleId === puzzle.puzzleId - 1);
   const nextPuzzle = puzzlesData.find(p => p.puzzleId === puzzle.puzzleId + 1);
 
-  const excludedKeys = ["puzzleId", "title", "difficulty", "category", "question", "solution", "answer", "hint"];
+  const excludedKeys = ["puzzleId", "title", "difficulty", "category", "question", "solution", "answer", "hint", "source"];
   const additionalFields = Object.entries(puzzle)
     .filter(([key, value]) => !excludedKeys.includes(key) && value && typeof value === "string" && value.trim().length > 0)
     .sort((a, b) => {
@@ -100,9 +100,16 @@ export default function PuzzleDetail({ loaderData }: { loaderData: { puzzle: typ
               {puzzle.difficulty}
             </span>
           </div>
-          <h1 className="text-4xl sm:text-5xl font-black tracking-tighter uppercase leading-[0.9]">
-            {puzzle.title}
-          </h1>
+          <div>
+            <h1 className="text-4xl sm:text-5xl font-black tracking-tighter uppercase leading-[0.9]">
+              {puzzle.title}
+            </h1>
+            {puzzle.source && (
+              <p className="text-[10px] font-bold text-[var(--muted-fg)] uppercase tracking-[0.2em] mt-4">
+                Source: {puzzle.source}
+              </p>
+            )}
+          </div>
         </div>
       </header>
 

@@ -124,7 +124,7 @@
   }
 
   .prose img {
-    @apply mx-auto my-8 border border-[var(--border)] max-h-[300px] w-auto h-auto object-contain;
+    @apply mx-auto my-8 max-h-[300px] w-auto h-auto object-contain;
     display: block;
   }
   
