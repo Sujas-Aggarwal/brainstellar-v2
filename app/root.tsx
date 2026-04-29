@@ -8,7 +8,20 @@ import {
 } from "react-router";
 
 import type { Route } from "./+types/root";
+import { UserProvider } from "./contexts/UserContext";
 import "./app.css";
+
+
+export const meta: Route.MetaFunction = () => [
+  { title: "Brainstellar | Puzzles, Brain Teasers & Logical Enigmas" },
+  { name: "description", content: "Master the art of logical thinking with Brainstellar. A curated collection of probability, strategy, and discrete math puzzles for tech interviews and mental gymnastics." },
+  { name: "keywords", content: "puzzles, brain teasers, logic, interview questions, quantitative, probability puzzles, brainstellar, math puzzles" },
+  { property: "og:title", content: "Brainstellar | The Ultimate Puzzle Collection" },
+  { property: "og:description", content: "Challenge your intellect with premium logic puzzles and brain teasers. Track your progress locally." },
+  { property: "og:type", content: "website" },
+  { name: "twitter:card", content: "summary_large_image" },
+  { name: "theme-color", content: "#f59e0b" },
+];
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -21,7 +34,16 @@ export const links: Route.LinksFunction = () => [
     rel: "stylesheet",
     href: "https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap",
   },
+  {
+    rel: "stylesheet",
+    href: "https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css",
+  },
+  {
+    rel: "preconnect",
+    href: "https://utteranc.es",
+  },
 ];
+
 
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
@@ -42,7 +64,11 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 export default function App() {
-  return <Outlet />;
+  return (
+    <UserProvider>
+      <Outlet />
+    </UserProvider>
+  );
 }
 
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
