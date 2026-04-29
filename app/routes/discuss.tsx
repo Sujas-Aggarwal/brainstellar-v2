@@ -1,27 +1,11 @@
 import { Navbar } from "~/components/Navbar";
-import { ChevronLeft, MessageCircle } from "lucide-react";
+import { ChevronLeft, MessageCircle, MessageSquare } from "lucide-react";
 import { Link } from "react-router";
-import { useEffect, useRef } from "react";
-import { useUser } from "~/contexts/UserContext";
+import { useState } from "react";
+import { Comments } from "~/components/Comments";
 
 export default function Discuss() {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const { theme } = useUser();
-
-  useEffect(() => {
-    const script = document.createElement("script");
-    script.src = "https://utteranc.es/client.js";
-    script.setAttribute("repo", "Sujas-Aggarwal/brainstellar-v2");
-    script.setAttribute("issue-term", "Global Discussion Archive");
-    script.setAttribute("theme", theme === "dark" ? "github-dark" : "github-light");
-    script.setAttribute("crossorigin", "anonymous");
-    script.async = true;
-
-    if (containerRef.current) {
-      containerRef.current.innerHTML = "";
-      containerRef.current.appendChild(script);
-    }
-  }, [theme]);
+  const [showComments, setShowComments] = useState(false);
 
   return (
     <div className="pt-24 pb-32 px-6 max-w-4xl mx-auto min-h-screen bg-[var(--bg)] text-[var(--fg)]">
@@ -33,7 +17,7 @@ export default function Discuss() {
         </Link>
         <div className="space-y-4">
           <h1 className="text-5xl font-bold tracking-tight flex items-center gap-4">
-            Global Archive Discussion
+            Discussion Forum
             <MessageCircle className="w-8 h-8 text-[var(--c-overall)]" />
           </h1>
           <p className="text-sm font-medium text-[var(--muted-fg)] leading-relaxed max-w-xl">
@@ -42,8 +26,20 @@ export default function Discuss() {
         </div>
       </header>
 
-      <div className="border-t border-[var(--border)] pt-12">
-        <div ref={containerRef} className="min-h-[400px]" />
+      <div className="space-y-8">
+        <button 
+          onClick={() => setShowComments(!showComments)}
+          className="flex items-center gap-3 px-8 py-4 border border-[var(--border)] hover:border-[var(--fg)] transition-all text-[10px] font-bold uppercase tracking-widest"
+        >
+          <MessageSquare className="w-4 h-4" />
+          {showComments ? "Hide Discussion Forum" : "Enter Discussion Forum"}
+        </button>
+
+        <div className={`transition-all duration-700 ease-in-out overflow-hidden ${showComments ? "max-h-[5000px] opacity-100" : "max-h-0 opacity-0"}`}>
+          <div className="pt-12 mt-4 border-t border-[var(--border)]">
+            <Comments issueTerm="Global Discussion Archive" />
+          </div>
+        </div>
       </div>
     </div>
   );

@@ -7,8 +7,10 @@ import { Search, Trophy, Target, Zap, Skull, Flame } from "lucide-react";
 import { useParams, useNavigate } from "react-router";
 import type { Route } from "./+types/home";
 
-export const meta: Route.MetaFunction = ({ params }) => {
-  const topic = params.category || params.difficulty || "Archive";
+import Fuse from "fuse.js";
+
+export const meta: Route.MetaFunction = ({ params }: { params: any }) => {
+  const topic = (params as any).category || (params as any).difficulty || "Archive";
   const title = `100+ Free ${topic} Puzzles | Interview Prep`;
   return [
     { title },
@@ -103,15 +105,43 @@ export default function Home() {
     return { total, solved, byDifficulty };
   }, [solvedPuzzles]);
 
+  const fuse = useMemo(() => {
+    return new Fuse(puzzlesData, {
+      keys: [
+        { name: 'title', weight: 3 },
+        { name: 'puzzleId', weight: 4 },
+        { name: 'question', weight: 1.5 },
+        { name: 'answer', weight: 1 },
+        { name: 'solution', weight: 1 },
+        { name: 'hint', weight: 0.5 },
+        { name: 'followUpQuestion', weight: 1 },
+        { name: 'followUpSolution', weight: 1 },
+        { name: 'trivia', weight: 0.5 },
+        { name: 'notes', weight: 0.5 },
+      ],
+      threshold: 0.35,
+      location: 0,
+      distance: 100,
+      minMatchCharLength: 2,
+      includeScore: true,
+      useExtendedSearch: true,
+    });
+  }, []);
+
   const filteredPuzzles = useMemo(() => {
-    return puzzlesData.filter(p => {
-      const matchesSearch = p.title.toLowerCase().includes(searchQuery.toLowerCase()) || p.puzzleId.toString().includes(searchQuery);
+    let result = puzzlesData;
+
+    if (searchQuery.trim()) {
+      result = fuse.search(searchQuery).map(r => r.item);
+    }
+
+    return result.filter(p => {
       const matchesCategory = selectedCategory === "All" || p.category.toLowerCase() === selectedCategory.toLowerCase();
       const matchesDifficulty = selectedDifficulty === "All" || p.difficulty.toLowerCase() === selectedDifficulty.toLowerCase();
       const matchesFavorites = !showFavorites || favoritePuzzles.includes(p.puzzleId);
-      return matchesSearch && matchesCategory && matchesDifficulty && matchesFavorites;
+      return matchesCategory && matchesDifficulty && matchesFavorites;
     });
-  }, [searchQuery, selectedCategory, selectedDifficulty, showFavorites, favoritePuzzles]);
+  }, [searchQuery, selectedCategory, selectedDifficulty, showFavorites, favoritePuzzles, fuse]);
 
   const handleCategorySelect = (cat: string) => {
     if (cat === "All") navigate("/");

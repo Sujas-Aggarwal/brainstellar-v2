@@ -149,11 +149,11 @@ export default function PuzzleDetail({ loaderData }: { loaderData: { puzzle: typ
           </button>
         </div>
 
-        {showComments && (
-          <div className="pt-12 border-t border-[var(--border)] animate-in fade-in duration-700">
+        <div className={`transition-all duration-700 ease-in-out overflow-hidden ${showComments ? "max-h-[5000px] opacity-100" : "max-h-0 opacity-0"}`}>
+          <div className="pt-12 mt-12 border-t border-[var(--border)]">
             <Comments puzzleId={puzzle.puzzleId} puzzleTitle={puzzle.title} />
           </div>
-        )}
+        </div>
       </main>
     </div>
   );

@@ -1,6 +1,6 @@
 import { Link } from "react-router";
 import { useUser } from "~/contexts/UserContext";
-import { Sun, Moon, Hash, Info } from "lucide-react";
+import { Sun, Moon, Hash, Info, MessageSquare } from "lucide-react";
 
 export function Navbar() {
   const { theme, toggleTheme } = useUser();
@@ -9,12 +9,6 @@ export function Navbar() {
     <nav className="fixed top-0 left-0 right-0 z-50 bg-[var(--bg)] border-b border-[var(--border)]">
       <div className="max-w-7xl mx-auto px-6 h-14 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <Link
-            to="/about"
-            className="hidden sm:flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--muted-fg)] hover:text-[var(--fg)] transition-colors"
-          >
-            <Info className="w-3 h-3" />
-          </Link>
           <Link to="/" className="flex items-center gap-2 group">
             <span className="text-sm font-bold uppercase tracking-tighter">
               Brainfuck
@@ -23,6 +17,22 @@ export function Navbar() {
         </div>
 
         <div className="flex items-center gap-1">
+          <div className="hidden sm:flex items-center gap-6 mr-6">
+            <Link
+              to="/discuss"
+              className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--muted-fg)] hover:text-[var(--fg)] transition-colors"
+            >
+              <MessageSquare className="w-3 h-3" />
+              Discuss
+            </Link>
+            <Link
+              to="/about"
+              className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--muted-fg)] hover:text-[var(--fg)] transition-colors"
+            >
+              About Us
+            </Link>
+          </div>
+
           <button
             onClick={toggleTheme}
             className="p-2 hover:bg-[var(--fg)] hover:text-[var(--bg)] transition-colors"
