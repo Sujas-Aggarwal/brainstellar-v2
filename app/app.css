@@ -90,6 +90,11 @@
     letter-spacing: -0.01em;
   }
 
+  .prose strong {
+    color: var(--fg) !important;
+    font-weight: 700 !important;
+  }
+
   .prose h1, .prose h2, .prose h3, .prose h4 {
     color: var(--fg) !important;
     font-weight: 700 !important;
