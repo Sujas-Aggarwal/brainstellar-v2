@@ -9,14 +9,15 @@ import {
 
 import type { Route } from "./+types/root";
 import { UserProvider } from "./contexts/UserContext";
+import { Footer } from "./components/Footer";
 import "./app.css";
 
 
 export const meta: Route.MetaFunction = () => [
-  { title: "Brainstellar | Puzzles, Brain Teasers & Logical Enigmas" },
-  { name: "description", content: "Master the art of logical thinking with Brainstellar. A curated collection of probability, strategy, and discrete math puzzles for tech interviews and mental gymnastics." },
-  { name: "keywords", content: "puzzles, brain teasers, logic, interview questions, quantitative, probability puzzles, brainstellar, math puzzles" },
-  { property: "og:title", content: "Brainstellar | The Ultimate Puzzle Collection" },
+  { title: "Brainfuck | Archive of Lethal Logic" },
+  { name: "description", content: "Master the art of logical warfare with Brainfuck. A curated collection of lethal probability, strategy, and math puzzles." },
+  { name: "keywords", content: "puzzles, brain teasers, logic, interview questions, quantitative, brainfuck, math puzzles" },
+  { property: "og:title", content: "Brainfuck | The Ultimate Archive" },
   { property: "og:description", content: "Challenge your intellect with premium logic puzzles and brain teasers. Track your progress locally." },
   { property: "og:type", content: "website" },
   { name: "twitter:card", content: "summary_large_image" },
@@ -32,7 +33,7 @@ export const links: Route.LinksFunction = () => [
   },
   {
     rel: "stylesheet",
-    href: "https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap",
+    href: "https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap",
   },
   {
     rel: "stylesheet",
@@ -67,6 +68,7 @@ export default function App() {
   return (
     <UserProvider>
       <Outlet />
+      <Footer />
     </UserProvider>
   );
 }

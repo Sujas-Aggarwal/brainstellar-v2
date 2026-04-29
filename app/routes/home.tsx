@@ -3,15 +3,70 @@ import { useUser } from "~/contexts/UserContext";
 import puzzlesData from "~/data/puzzles.json";
 import { Navbar } from "~/components/Navbar";
 import { PuzzleCard } from "~/components/PuzzleCard";
-import { Search, Filter, SlidersHorizontal, Heart } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { Search, Trophy, Target, Zap, Skull, Flame } from "lucide-react";
 import type { Route } from "./+types/home";
 
 export const meta: Route.MetaFunction = () => [
-  { title: "Brainstellar | The Ultimate Collection of Logic Puzzles" },
-  { name: "description", content: "Solve over 500+ logic puzzles, probability riddles, and brain teasers. Track your progress, save favorites, and master interview-style challenges." },
+  { title: "Brainfuck Puzzles" },
+  { name: "description", content: "Master the logic archive. Track your domination." },
 ];
 
+function ProgressCircle({ current, total, label, icon: Icon, colorVar }: { current: number; total: number; label: string; icon: any; colorVar: string }) {
+  const percentage = total > 0 ? Math.round((current / total) * 100) : 0;
+  const radius = 28;
+  const circumference = 2 * Math.PI * radius;
+  const offset = circumference - (percentage / 100) * circumference;
+
+  return (
+    <div className="flex flex-col items-center gap-3 p-6 border border-[var(--border)] group hover:border-[var(--fg)] transition-all bg-[var(--bg)] relative overflow-hidden">
+      {/* Subtle background glow when progress exists */}
+      {percentage > 0 && (
+        <div 
+          className="absolute inset-0 opacity-[0.03] transition-opacity group-hover:opacity-[0.07]"
+          style={{ backgroundColor: `var(${colorVar})` }}
+        />
+      )}
+      
+      <div className="relative w-16 h-16 z-10">
+        <svg className="w-full h-full -rotate-90">
+          <circle
+            cx="32"
+            cy="32"
+            r={radius}
+            fill="transparent"
+            stroke="var(--border)"
+            strokeWidth="3"
+          />
+          <circle
+            cx="32"
+            cy="32"
+            r={radius}
+            fill="transparent"
+            stroke={`var(${colorVar})`}
+            strokeWidth="3"
+            strokeDasharray={circumference}
+            strokeDashoffset={offset}
+            strokeLinecap="round"
+            className="transition-all duration-1000 ease-out"
+          />
+        </svg>
+        <div className="absolute inset-0 flex items-center justify-center">
+          <Icon 
+            className="w-4 h-4 transition-colors" 
+            style={{ color: percentage > 0 ? `var(${colorVar})` : 'var(--muted-fg)' }} 
+          />
+        </div>
+      </div>
+      <div className="text-center z-10">
+        <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--muted-fg)]">{label}</div>
+        <div className="text-sm font-black tracking-tighter">
+          {current}<span className="opacity-20 mx-0.5">/</span>{total}
+        </div>
+        <div className="text-[10px] font-black mt-1" style={{ color: `var(${colorVar})` }}>{percentage}%</div>
+      </div>
+    </div>
+  );
+}
 
 export default function Home() {
   const { solvedPuzzles, favoritePuzzles } = useUser();
@@ -20,170 +75,186 @@ export default function Home() {
   const [selectedDifficulty, setSelectedDifficulty] = useState("All");
   const [showFavorites, setShowFavorites] = useState(false);
 
-  const categories = useMemo(() => 
-    ["All", ...new Set(puzzlesData.map(p => p.category))], 
-  []);
-  
-  const difficulties = ["All", "Easy", "Medium", "Hard"];
+  const categories = useMemo(() => ["All", ...new Set(puzzlesData.map(p => p.category))], []);
+  const difficulties = ["All", "Easy", "Medium", "Hard", "Deadly"];
+
+  const stats = useMemo(() => {
+    const total = puzzlesData.length;
+    const solved = solvedPuzzles.length;
+    
+    const byDifficulty = {
+      easy: { solved: 0, total: 0 },
+      medium: { solved: 0, total: 0 },
+      hard: { solved: 0, total: 0 },
+      deadly: { solved: 0, total: 0 },
+    };
+
+    puzzlesData.forEach(p => {
+      const d = p.difficulty.toLowerCase() as keyof typeof byDifficulty;
+      if (byDifficulty[d]) {
+        byDifficulty[d].total++;
+        if (solvedPuzzles.includes(p.puzzleId)) {
+          byDifficulty[d].solved++;
+        }
+      }
+    });
+
+    return { total, solved, byDifficulty };
+  }, [solvedPuzzles]);
 
   const filteredPuzzles = useMemo(() => {
     return puzzlesData.filter(p => {
-      const matchesSearch = p.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                          p.puzzleId.toString().includes(searchQuery);
+      const matchesSearch = p.title.toLowerCase().includes(searchQuery.toLowerCase()) || p.puzzleId.toString().includes(searchQuery);
       const matchesCategory = selectedCategory === "All" || p.category === selectedCategory;
-      const matchesDifficulty = selectedDifficulty === "All" || 
-                               p.difficulty.toLowerCase() === selectedDifficulty.toLowerCase();
+      const matchesDifficulty = selectedDifficulty === "All" || p.difficulty.toLowerCase() === selectedDifficulty.toLowerCase();
       const matchesFavorites = !showFavorites || favoritePuzzles.includes(p.puzzleId);
-      
       return matchesSearch && matchesCategory && matchesDifficulty && matchesFavorites;
     });
   }, [searchQuery, selectedCategory, selectedDifficulty, showFavorites, favoritePuzzles]);
 
   return (
-    <div className="min-h-screen pt-24 pb-12 px-4 sm:px-6">
+    <div className="pt-24 pb-32 px-6 max-w-7xl mx-auto min-h-screen bg-[var(--bg)] text-[var(--fg)]">
       <Navbar />
       
-      <main className="max-w-7xl mx-auto space-y-12">
-        {/* Header Section */}
-        <section className="space-y-4">
-          <motion.h1 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-4xl sm:text-6xl font-extrabold tracking-tight text-white"
-          >
-            Master the <span className="text-primary">Art of Puzzles</span>
-          </motion.h1>
-          <motion.p 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="text-lg text-white/50 max-w-2xl leading-relaxed"
-          >
-            Your progress is saved automatically on your device. No account needed.
-          </motion.p>
-        </section>
-
-        {/* Filters Section */}
-        <section className="glass rounded-3xl p-6 sm:p-8 space-y-6">
-          <div className="flex flex-col lg:flex-row gap-6">
-            {/* Search */}
-            <div className="flex-1 relative group">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/20 group-focus-within:text-primary transition-colors" />
-              <input
-                type="text"
-                placeholder="Search puzzles by title or ID..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full bg-black/20 border border-white/5 focus:border-primary/50 focus:ring-1 focus:ring-primary/50 rounded-2xl py-4 pl-12 pr-4 outline-none transition-all placeholder:text-white/20 text-white"
-              />
-            </div>
-
-            {/* Category Filter */}
-            <div className="flex items-center gap-2 overflow-x-auto pb-2 sm:pb-0 no-scrollbar">
-              <Filter className="w-4 h-4 text-white/20 shrink-0" />
-              <div className="flex gap-2">
-                {categories.map((cat) => (
-                  <button
-                    key={cat}
-                    onClick={() => setSelectedCategory(cat)}
-                    className={`px-4 py-2 rounded-xl text-sm font-bold transition-all shrink-0 ${
-                      selectedCategory === cat
-                        ? "bg-primary text-primary-foreground"
-                        : "bg-white/5 text-white/40 hover:bg-white/10 hover:text-white/60"
-                    }`}
-                  >
-                    {cat.charAt(0).toUpperCase() + cat.slice(1)}
-                  </button>
-                ))}
+      {/* Domination Dashboard */}
+      <section className="mb-20 space-y-12">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-[var(--border)] pb-8">
+          <div className="space-y-2">
+            <h1 className="text-4xl sm:text-6xl font-black uppercase tracking-tighter leading-[0.8] flex items-center gap-4">
+              Archive
+              <Flame className="w-8 h-8 text-[var(--c-hard)] animate-pulse" />
+            </h1>
+            <p className="text-xs font-bold text-[var(--muted-fg)] uppercase tracking-[0.3em]">
+              {stats.solved === stats.total ? "Archive Conquest Complete" : "Analyze. Solve. Conquer."}
+            </p>
+          </div>
+          <div className="flex items-center gap-8">
+            <div className="text-right">
+              <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--muted-fg)]">Conquest Rate</div>
+              <div className="text-3xl font-black tracking-tighter text-[var(--c-overall)]">
+                {Math.round((stats.solved / stats.total) * 100)}%
               </div>
+            </div>
+            <div className="w-px h-10 bg-[var(--border)]" />
+            <div className="text-right">
+              <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--muted-fg)]">Starred</div>
+              <div className="text-3xl font-black tracking-tighter">{favoritePuzzles.length}</div>
             </div>
           </div>
+        </div>
 
-          <div className="flex flex-wrap items-center justify-between gap-4 pt-4 border-t border-white/5">
-            <div className="flex flex-wrap items-center gap-6">
-              <div className="flex items-center gap-2">
-                <div className="flex items-center gap-2 text-xs font-bold text-white/20 uppercase tracking-widest">
-                  <SlidersHorizontal className="w-3 h-3" />
-                  Difficulty
-                </div>
-                <div className="flex gap-2">
-                  {difficulties.map((diff) => (
-                    <button
-                      key={diff}
-                      onClick={() => setSelectedDifficulty(diff)}
-                      className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all border ${
-                        selectedDifficulty === diff
-                          ? "bg-white/10 border-white/20 text-white"
-                          : "bg-transparent border-transparent text-white/30 hover:text-white/50"
-                      }`}
-                    >
-                      {diff}
-                    </button>
-                  ))}
-                </div>
-              </div>
+        <div className="grid grid-cols-2 lg:grid-cols-5 gap-px bg-[var(--border)] border border-[var(--border)]">
+          <ProgressCircle 
+            current={stats.solved} 
+            total={stats.total} 
+            label="Overall" 
+            icon={Trophy} 
+            colorVar="--c-overall"
+          />
+          <ProgressCircle 
+            current={stats.byDifficulty.easy.solved} 
+            total={stats.byDifficulty.easy.total} 
+            label="Easy" 
+            icon={Target} 
+            colorVar="--c-easy"
+          />
+          <ProgressCircle 
+            current={stats.byDifficulty.medium.solved} 
+            total={stats.byDifficulty.medium.total} 
+            label="Medium" 
+            icon={Zap} 
+            colorVar="--c-medium"
+          />
+          <ProgressCircle 
+            current={stats.byDifficulty.hard.solved} 
+            total={stats.byDifficulty.hard.total} 
+            label="Hard" 
+            icon={Flame} 
+            colorVar="--c-hard"
+          />
+          <ProgressCircle 
+            current={stats.byDifficulty.deadly.solved} 
+            total={stats.byDifficulty.deadly.total} 
+            label="Deadly" 
+            icon={Skull} 
+            colorVar="--c-deadly"
+          />
+        </div>
+      </section>
 
-              <div className="w-px h-6 bg-white/5 hidden sm:block" />
+      <section className="mb-16 space-y-8">
+        <div className="flex flex-col lg:flex-row gap-6">
+          <div className="flex-1 relative group">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--muted-fg)]" />
+            <input
+              type="text"
+              placeholder="LOCATE TARGET..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full bg-[var(--bg)] border border-[var(--border)] px-12 py-4 text-xs font-bold uppercase tracking-widest outline-none focus:border-[var(--fg)] transition-all placeholder:text-[var(--muted-fg)]"
+            />
+          </div>
 
+          <div className="flex gap-2 overflow-x-auto no-scrollbar pb-2 lg:pb-0">
+            {categories.map((cat) => (
               <button
-                onClick={() => setShowFavorites(!showFavorites)}
-                className={`flex items-center gap-2 px-4 py-1.5 rounded-xl text-xs font-bold transition-all border ${
-                  showFavorites 
-                    ? "bg-rose-500/10 border-rose-500/20 text-rose-500" 
-                    : "bg-white/5 border-white/5 text-white/30 hover:text-white/50"
+                key={cat}
+                onClick={() => setSelectedCategory(cat)}
+                className={`px-5 py-3 text-[10px] font-bold uppercase tracking-widest border transition-all whitespace-nowrap ${
+                  selectedCategory === cat 
+                    ? "bg-[var(--fg)] text-[var(--bg)] border-[var(--fg)]" 
+                    : "bg-[var(--bg)] text-[var(--muted-fg)] border-[var(--border)] hover:border-[var(--fg)] hover:text-[var(--fg)]"
                 }`}
               >
-                <Heart className={`w-3.5 h-3.5 ${showFavorites ? "fill-rose-500" : ""}`} />
-                Favorites Only
+                {cat}
               </button>
-            </div>
+            ))}
+          </div>
+        </div>
 
-            <div className="text-xs font-bold text-white/20 uppercase tracking-widest">
-              {filteredPuzzles.length} Challenges found
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 py-6 border-y border-[var(--border)]">
+          <div className="flex items-center gap-8">
+            <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-[var(--muted-fg)]">Difficulty:</span>
+            <div className="flex gap-8">
+              {difficulties.map((diff) => (
+                <button
+                  key={diff}
+                  onClick={() => setSelectedDifficulty(diff)}
+                  className={`text-[10px] font-bold uppercase tracking-[0.15em] transition-all relative py-1 ${
+                    selectedDifficulty === diff 
+                      ? "text-[var(--fg)] after:content-[''] after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[2px] after:bg-[var(--fg)]" 
+                      : "text-[var(--muted-fg)] hover:text-[var(--fg)]"
+                  }`}
+                >
+                  {diff}
+                </button>
+              ))}
             </div>
           </div>
-        </section>
 
-        {/* Puzzles Grid */}
-        <section>
-          <motion.div 
-            layout
-            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+          <button
+            onClick={() => setShowFavorites(!showFavorites)}
+            className={`text-[10px] font-bold uppercase tracking-[0.15em] px-6 py-2 border transition-all ${
+              showFavorites 
+                ? "bg-[var(--fg)] text-[var(--bg)] border-[var(--fg)]" 
+                : "bg-[var(--bg)] text-[var(--muted-fg)] border-[var(--border)] hover:border-[var(--fg)] hover:text-[var(--fg)]"
+            }`}
           >
-            <AnimatePresence mode="popLayout">
-              {filteredPuzzles.map((puzzle) => (
-                <motion.div
-                  key={puzzle.puzzleId}
-                  layout
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.9 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  <PuzzleCard 
-                    puzzle={puzzle} 
-                    isSolved={solvedPuzzles.includes(puzzle.puzzleId)} 
-                  />
-                </motion.div>
-              ))}
-            </AnimatePresence>
-          </motion.div>
+            {showFavorites ? "Viewing Starred" : "Star Filters"}
+          </button>
+        </div>
+      </section>
 
-          {filteredPuzzles.length === 0 && (
-            <div className="text-center py-24 glass rounded-3xl">
-              <p className="text-white/40 text-lg">No puzzles found matching your criteria.</p>
-              {showFavorites && (
-                <button 
-                  onClick={() => setShowFavorites(false)}
-                  className="mt-4 text-primary font-bold hover:underline"
-                >
-                  Clear Favorites filter
-                </button>
-              )}
-            </div>
-          )}
-        </section>
-      </main>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 border-l border-t border-[var(--border)]">
+        {filteredPuzzles.map((puzzle) => (
+          <div key={puzzle.puzzleId} className="border-r border-b border-[var(--border)]">
+            <PuzzleCard 
+              puzzle={puzzle} 
+              isSolved={solvedPuzzles.includes(puzzle.puzzleId)} 
+            />
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

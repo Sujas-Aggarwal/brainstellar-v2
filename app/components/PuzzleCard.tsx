@@ -1,7 +1,7 @@
 import { Link } from "react-router";
-import { CheckCircle2, ChevronRight, Heart } from "lucide-react";
-import { clsx } from "clsx";
 import { useUser } from "~/contexts/UserContext";
+import { Heart, Circle, CheckCircle2 } from "lucide-react";
+import { clsx } from "clsx";
 
 interface PuzzleCardProps {
   puzzle: {
@@ -17,67 +17,54 @@ export function PuzzleCard({ puzzle, isSolved }: PuzzleCardProps) {
   const { favoritePuzzles, toggleFavorite } = useUser();
   const isFavorite = favoritePuzzles.includes(puzzle.puzzleId);
 
-  const difficultyColor = {
-    easy: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
-    medium: "bg-amber-500/10 text-amber-400 border-amber-500/20",
-    hard: "bg-rose-500/10 text-rose-400 border-rose-500/20",
-  }[puzzle.difficulty.toLowerCase()] || "bg-zinc-500/10 text-zinc-400 border-zinc-500/20";
-
-  const handleFavoriteClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    toggleFavorite(puzzle.puzzleId);
-  };
-
   return (
     <Link
       to={`/puzzles/${puzzle.puzzleId}`}
-      className="group relative block rounded-2xl glass-card p-6 overflow-hidden"
+      className="group block card-minimal h-full border-0"
     >
-      <div className="absolute top-4 right-4 flex items-center gap-2 z-10">
-        <button
-          onClick={handleFavoriteClick}
-          className={clsx(
-            "p-2 rounded-lg transition-all",
-            isFavorite ? "text-rose-500 bg-rose-500/10" : "text-white/20 hover:text-white/40 bg-white/5"
-          )}
-        >
-          <Heart className={clsx("w-4 h-4", isFavorite && "fill-rose-500")} />
-        </button>
-        {isSolved && (
-          <div className="text-emerald-500 p-2 rounded-lg bg-emerald-500/10">
-            <CheckCircle2 className="w-4 h-4 fill-emerald-500/10" />
+      <div className="flex flex-col h-full gap-6">
+        <div className="flex items-center justify-between">
+          <div className="flex gap-2">
+            <span className="text-[10px] font-bold uppercase tracking-[0.1em] border border-[var(--border)] px-2 py-0.5 text-[var(--muted-fg)]">
+              {puzzle.difficulty}
+            </span>
+            <span className="text-[10px] font-bold uppercase tracking-[0.1em] bg-[var(--muted)] text-[var(--muted-fg)] px-2 py-0.5">
+              {puzzle.category}
+            </span>
           </div>
-        )}
-      </div>
-      
-      <div className="flex flex-col gap-4">
-        <div className="flex items-center gap-2">
-          <span className={clsx("text-[10px] uppercase tracking-wider font-bold px-2.5 py-1 rounded-full border", difficultyColor)}>
-            {puzzle.difficulty}
-          </span>
-          <span className="text-[10px] uppercase tracking-wider font-bold px-2.5 py-1 rounded-full bg-white/5 border border-white/10 text-white/40">
-            {puzzle.category}
-          </span>
+          <button
+            onClick={(e) => { e.preventDefault(); toggleFavorite(puzzle.puzzleId); }}
+            className={clsx("transition-colors p-1 -m-1", isFavorite ? "text-[var(--fg)]" : "text-[var(--muted-fg)] hover:text-[var(--fg)]")}
+          >
+            <Heart className={clsx("w-3.5 h-3.5", isFavorite && "fill-[var(--fg)]")} />
+          </button>
         </div>
 
-        <div>
-          <h3 className="text-xl font-bold text-white group-hover:text-primary transition-colors leading-tight mb-2 pr-12">
+        <div className="space-y-2">
+          <h3 className="text-[15px] font-semibold leading-relaxed tracking-normal text-[var(--fg)] group-hover:text-[var(--muted-fg)] transition-colors">
             {puzzle.title}
           </h3>
-          <p className="text-sm text-white/40 line-clamp-1">
-            Puzzle #{puzzle.puzzleId}
+          <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--muted-fg)] opacity-50">
+            ID: {puzzle.puzzleId}
           </p>
         </div>
 
-        <div className="flex items-center gap-2 text-sm font-medium text-white/60 group-hover:text-white transition-colors mt-auto">
-          <span>Solve Challenge</span>
-          <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+        <div className="flex items-center justify-between pt-4 mt-auto">
+          <div className="flex items-center gap-2">
+            {isSolved ? (
+              <CheckCircle2 className="w-3.5 h-3.5 text-[var(--fg)]" />
+            ) : (
+              <Circle className="w-3.5 h-3.5 text-[var(--muted-fg)]/30" />
+            )}
+            <span className={clsx("text-[10px] font-bold uppercase tracking-[0.1em]", isSolved ? "text-[var(--fg)]" : "text-[var(--muted-fg)]")}>
+              {isSolved ? "Solved" : "Unsolved"}
+            </span>
+          </div>
+          <span className="text-[10px] font-bold uppercase tracking-[0.1em] text-[var(--muted-fg)] group-hover:text-[var(--fg)] transition-colors">
+            Open
+          </span>
         </div>
       </div>
-
-      {/* Decorative gradient */}
-      <div className="absolute -bottom-8 -right-8 w-24 h-24 bg-primary/10 blur-3xl rounded-full group-hover:bg-primary/20 transition-colors" />
     </Link>
   );
 }

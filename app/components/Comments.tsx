@@ -1,18 +1,18 @@
 import { useEffect, useRef, useState } from "react";
 import { MessageSquare, ChevronDown, ChevronUp } from "lucide-react";
-import { motion } from "framer-motion";
+import { useUser } from "~/contexts/UserContext";
 
 export function Comments() {
   const containerRef = useRef<HTMLDivElement>(null);
   const [isOpen, setIsOpen] = useState(false);
+  const { theme } = useUser();
 
   useEffect(() => {
-    // Inject script immediately
     const script = document.createElement("script");
     script.src = "https://utteranc.es/client.js";
     script.setAttribute("repo", "Sujas-Aggarwal/brainstellar-v2");
     script.setAttribute("issue-term", "pathname");
-    script.setAttribute("theme", "github-dark");
+    script.setAttribute("theme", theme === "dark" ? "github-dark" : "github-light");
     script.setAttribute("crossorigin", "anonymous");
     script.async = true;
 
@@ -20,46 +20,35 @@ export function Comments() {
       containerRef.current.innerHTML = "";
       containerRef.current.appendChild(script);
     }
-  }, []);
+  }, [theme]);
 
   return (
-    <section className="pt-8 border-t border-white/5">
+    <section className="pt-24 border-t border-[var(--border)]">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full flex items-center justify-between p-6 rounded-[1.5rem] bg-white/2 border border-white/5 hover:bg-white/5 transition-all group"
+        className="w-full flex items-center justify-between p-10 border border-[var(--border)] bg-[var(--bg)] hover:bg-[var(--muted)] transition-all group"
       >
-        <div className="flex items-center gap-4">
-          <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
-            <MessageSquare className="w-5 h-5" />
-          </div>
+        <div className="flex items-center gap-8">
+          <MessageSquare className="w-5 h-5 text-[var(--fg)]" />
           <div className="text-left">
-            <h3 className="text-lg font-bold text-white">Join the Discussion</h3>
-            <p className="text-xs text-white/30 font-medium">Read comments or share your solution</p>
+            <h3 className="text-[15px] font-bold tracking-tight text-[var(--fg)]">Archive Discussion</h3>
+            <p className="text-[10px] font-bold text-[var(--muted-fg)] uppercase tracking-[0.15em] mt-1.5">Share your logic with the community</p>
           </div>
         </div>
-        <div className="w-10 h-10 rounded-xl flex items-center justify-center text-white/20 group-hover:text-white transition-colors">
-          {isOpen ? <ChevronUp className="w-6 h-6" /> : <ChevronDown className="w-6 h-6" />}
+        <div className="transition-transform duration-300">
+          {isOpen ? <ChevronUp className="w-5 h-5 text-[var(--muted-fg)]" /> : <ChevronDown className="w-5 h-5 text-[var(--muted-fg)]" />}
         </div>
       </button>
       
-      {/* 
-        CRITICAL: We use height/opacity/pointer-events instead of display:none.
-        This ensures the Utterances iframe actually renders and fetches content 
-        in the background while being completely invisible to the user.
-      */}
       <div 
         className={`transition-all duration-500 ease-in-out overflow-hidden ${
-          isOpen 
-            ? "max-h-[2000px] opacity-100 mt-8 pointer-events-auto" 
-            : "max-h-0 opacity-0 pointer-events-none"
+          isOpen ? "max-h-[4000px] opacity-100 mt-20 pb-20" : "max-h-0 opacity-0"
         }`}
       >
-        <div className="px-2 sm:px-6">
-          <div 
-            ref={containerRef} 
-            className="utterances-container min-h-[200px]" 
-          />
-        </div>
+        <div 
+          ref={containerRef} 
+          className="utterances-container min-h-[200px]" 
+        />
       </div>
     </section>
   );

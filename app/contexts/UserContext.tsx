@@ -3,42 +3,50 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 interface UserData {
   solvedPuzzles: number[];
   favoritePuzzles: number[];
+  theme: "light" | "dark";
 }
 
 interface UserContextType {
   solvedPuzzles: number[];
   favoritePuzzles: number[];
+  theme: "light" | "dark";
   toggleSolved: (id: number) => void;
   toggleFavorite: (id: number) => void;
+  toggleTheme: () => void;
   exportData: () => void;
   importData: (data: string) => boolean;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
-const STORAGE_KEY = "brainstellar_user_data";
+const STORAGE_KEY = "brainfuck_user_data_v2";
 
 export function UserProvider({ children }: { children: React.ReactNode }) {
   const [data, setData] = useState<UserData>({
     solvedPuzzles: [],
     favoritePuzzles: [],
+    theme: "dark",
   });
 
-  // Load from localStorage on mount
   useEffect(() => {
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved) {
       try {
-        setData(JSON.parse(saved));
+        const parsed = JSON.parse(saved);
+        setData(parsed);
       } catch (e) {
         console.error("Failed to parse saved data", e);
       }
     }
   }, []);
 
-  // Save to localStorage whenever data changes
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    if (data.theme === "dark") {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
   }, [data]);
 
   const toggleSolved = (id: number) => {
@@ -59,12 +67,16 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     }));
   };
 
+  const toggleTheme = () => {
+    setData(prev => ({ ...prev, theme: prev.theme === "light" ? "dark" : "light" }));
+  };
+
   const exportData = () => {
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `brainstellar_progress_${new Date().toISOString().split('T')[0]}.json`;
+    a.download = `brainfuck_v2_progress_${new Date().toISOString().split('T')[0]}.json`;
     a.click();
     URL.revokeObjectURL(url);
   };
@@ -73,7 +85,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     try {
       const imported = JSON.parse(jsonString);
       if (Array.isArray(imported.solvedPuzzles) && Array.isArray(imported.favoritePuzzles)) {
-        setData(imported);
+        setData(prev => ({ ...prev, ...imported }));
         return true;
       }
     } catch (e) {
@@ -84,14 +96,16 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <UserContext.Provider value={{ 
-      solvedPuzzles: data.solvedPuzzles, 
-      favoritePuzzles: data.favoritePuzzles, 
+      ...data,
       toggleSolved, 
       toggleFavorite,
+      toggleTheme,
       exportData,
       importData
     }}>
-      {children}
+      <div className="theme-transition min-h-screen bg-[var(--bg)] text-[var(--fg)]">
+        {children}
+      </div>
     </UserContext.Provider>
   );
 }
