@@ -28,15 +28,15 @@ export function Footer() {
         <div className="space-y-6">
           <div className="text-xl font-bold tracking-tighter uppercase">Brainfuck</div>
           <p className="text-xs font-bold text-[var(--muted-fg)] uppercase tracking-[0.3em] max-w-xs leading-relaxed">
-            The ultimate archive of lethal logic and mathematical challenges.
+            100+ Free high-quality logic puzzles for Quant, HFT, and SDE interviews.
           </p>
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-12 sm:gap-24">
           <div className="space-y-6">
-            <h4 className="text-[10px] font-bold uppercase tracking-[0.4em] text-[var(--fg)]">Archive</h4>
+            <h4 className="text-[10px] font-bold uppercase tracking-[0.4em] text-[var(--fg)]">Resources</h4>
             <ul className="space-y-4 text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--muted-fg)]">
-              <li><Link to="/" className="hover:text-[var(--fg)] transition-colors">Puzzles</Link></li>
+              <li><Link to="/" className="hover:text-[var(--fg)] transition-colors">Free Puzzles</Link></li>
               <li><Link to="/discuss" className="hover:text-[var(--fg)] transition-colors">Discussion Forum</Link></li>
               <li><Link to="/submit" className="hover:text-[var(--fg)] transition-colors">Submit a Puzzle</Link></li>
             </ul>
@@ -47,23 +47,24 @@ export function Footer() {
             <ul className="space-y-4 text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--muted-fg)]">
               <li><a href="https://www.linkedin.com/in/sujasaggarwal/" target="_blank" rel="noopener noreferrer" className="hover:text-[var(--fg)] transition-colors">LinkedIn</a></li>
               <li><a href="https://github.com/Sujas-Aggarwal" target="_blank" rel="noopener noreferrer" className="hover:text-[var(--fg)] transition-colors">GitHub</a></li>
+              <li><Link to="/about" className="hover:text-[var(--fg)] transition-colors">About Us</Link></li>
             </ul>
           </div>
 
           <div className="space-y-6">
-            <h4 className="text-[10px] font-bold uppercase tracking-[0.4em] text-[var(--fg)]">Sync</h4>
+            <h4 className="text-[10px] font-bold uppercase tracking-[0.4em] text-[var(--fg)]">Progress Sync</h4>
             <ul className="space-y-4 text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--muted-fg)]">
               <li>
                 <button onClick={exportData} className="flex items-center gap-2 hover:text-[var(--fg)] transition-colors">
                   <Download className="w-3 h-3" />
-                  Export Progress
+                  Export Data
                 </button>
               </li>
               <li>
                 <input type="file" ref={fileInputRef} onChange={handleImport} className="hidden" accept=".json" />
                 <button onClick={() => fileInputRef.current?.click()} className="flex items-center gap-2 hover:text-[var(--fg)] transition-colors">
                   <Upload className="w-3 h-3" />
-                  Import Progress
+                  Import Data
                 </button>
               </li>
             </ul>
@@ -73,7 +74,7 @@ export function Footer() {
 
       <div className="max-w-7xl mx-auto mt-32 pt-8 border-t border-[var(--border)] flex justify-between items-center text-[9px] font-bold uppercase tracking-[0.4em] text-[var(--muted-fg)]/40">
         <div>© {currentYear} BRAINFUCK ARCHIVE</div>
-        <div className="hidden sm:block">CONQUER THE VOID</div>
+        <div className="hidden sm:block">PREPARE FOR INTERVIEW</div>
       </div>
     </footer>
   );
