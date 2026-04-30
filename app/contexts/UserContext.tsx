@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, { createContext, useContext, useEffect, useState, useRef } from "react";
 import { 
   onAuthStateChanged, 
   signInWithPopup, 
@@ -43,6 +43,9 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     favoritePuzzles: [],
     theme: "dark",
   });
+
+  const syncTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const pendingDataRef = useRef<Partial<UserData>>({});
 
   // Load data from localStorage on initial mount
   useEffect(() => {
@@ -176,12 +179,35 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     }
   }, [data, user, loading]);
 
-  // Sync actions to the correct source
-  const syncToCloud = async (newData: Partial<UserData>) => {
-    if (user) {
-      const userDocRef = doc(db, "users", user.uid);
-      await setDoc(userDocRef, newData, { merge: true });
+  // Debounced sync to cloud
+  const syncToCloud = (newData: Partial<UserData>) => {
+    if (!user) return;
+
+    // Merge new data into pending updates
+    pendingDataRef.current = { ...pendingDataRef.current, ...newData };
+
+    // Clear existing timeout
+    if (syncTimeoutRef.current) {
+      clearTimeout(syncTimeoutRef.current);
     }
+
+    // Set new timeout for 1 second
+    syncTimeoutRef.current = setTimeout(async () => {
+      if (user && Object.keys(pendingDataRef.current).length > 0) {
+        console.log("Syncing batched changes to Firestore:", pendingDataRef.current);
+        const userDocRef = doc(db, "users", user.uid);
+        const dataToSync = { ...pendingDataRef.current };
+        pendingDataRef.current = {}; // Clear before async call to avoid race conditions
+        
+        try {
+          await setDoc(userDocRef, dataToSync, { merge: true });
+        } catch (error) {
+          console.error("Failed to sync to Firestore:", error);
+          // Optionally put back into pending if it failed
+          pendingDataRef.current = { ...dataToSync, ...pendingDataRef.current };
+        }
+      }
+    }, 1000);
   };
 
   const signIn = async () => {
