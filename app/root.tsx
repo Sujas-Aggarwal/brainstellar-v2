@@ -122,18 +122,13 @@ export default function App() {
     const hostname = window.location.hostname;
     const targetDomain = "www.brainfuck.online";
 
-    // Redirect logic
-    if (
-      hostname !== targetDomain &&
-      hostname !== "localhost" &&
-      !hostname.includes("127.0.0.1")
-    ) {
-      window.location.replace(`https://${targetDomain}${window.location.pathname}${window.location.search}`);
-      return;
-    }
-
     // Show migration modal if on legacy domain or for testing
-    if (hostname.includes("sujas.me") || hostname.includes("localhost")) {
+    if (
+      hostname.includes("sujas.me") ||
+      hostname.includes("brainfuck.site") ||
+      hostname.includes("brainfuck.com") ||
+      hostname.includes("localhost")
+    ) {
       setShowMigrationModal(true);
       checkConnectivity();
     }
@@ -190,7 +185,7 @@ export default function App() {
 
               <div className="space-y-4">
                 <p className="text-sm font-medium leading-relaxed text-(--muted-fg)">
-                  Brainfuck is evolving. We are moving our entire puzzle archive to our new permanent home at <span className="text-(--fg) font-bold italic">www.brainfuck.online</span>.
+                  Brainfuck is evolving. We are moving our entire puzzle archive to our new permanent home at <span className="text-(--fg) font-bold">brainfuck.online</span>.
                 </p>
                 
                 <div className="p-6 border border-(--border) bg-(--muted)/30 rounded-xl space-y-3">
@@ -233,7 +228,7 @@ export default function App() {
                     href="https://www.brainfuck.online"
                     className="flex-1 flex items-center justify-center gap-2 bg-(--fg) text-(--bg) px-8 py-4 text-[10px] font-bold uppercase tracking-widest hover:opacity-90 transition-all shadow-xl shadow-(--fg)/10"
                   >
-                    Go to www.brainfuck.online
+                    Go to brainfuck.online
                     <ExternalLink className="w-3.5 h-3.5" />
                   </a>
                 )}
