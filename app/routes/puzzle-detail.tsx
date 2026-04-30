@@ -15,6 +15,7 @@ import {
   Star,
   CheckCircle,
   MessageSquare,
+  Share2,
 } from "lucide-react";
 import type { Route } from "./+types/puzzle-detail";
 
@@ -33,9 +34,9 @@ export const meta: Route.MetaFunction = ({ data }) => {
     },
     { property: "og:title", content: `${puzzle.title} | Interview Puzzle Solution` },
     { property: "og:description", content: `Step-by-step solution for ${puzzle.title}. A ${puzzle.difficulty} level ${puzzle.category} puzzle for interview prep.` },
-    { property: "og:url", content: `https://brainfuck.site/puzzles/${puzzle.puzzleId}` },
+    { property: "og:url", content: `https://brainfuck.sujas.me/puzzles/${puzzle.puzzleId}` },
     { property: "og:type", content: "article" },
-    { rel: "canonical", href: `https://brainfuck.site/puzzles/${puzzle.puzzleId}` },
+    { rel: "canonical", href: `https://brainfuck.sujas.me/puzzles/${puzzle.puzzleId}` },
   ];
 };
 
@@ -61,6 +62,31 @@ export default function PuzzleDetail({
 
   const isSolved = solvedPuzzles.includes(puzzle.puzzleId);
   const isFavorite = favoritePuzzles.includes(puzzle.puzzleId);
+
+  const handleShare = async () => {
+    const shareUrl = `https://brainfuck.sujas.me/puzzles/${puzzle.puzzleId}`;
+
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: `${puzzle.title} | Puzzle`,
+          text: `${puzzle.title} | Puzzle`,
+          url: shareUrl,
+        });
+      } catch (err) {
+        if ((err as Error).name !== "AbortError") {
+          console.error("Error sharing:", err);
+        }
+      }
+    } else {
+      try {
+        await navigator.clipboard.writeText(shareUrl);
+        alert("Link copied to clipboard!");
+      } catch (err) {
+        console.error("Error copying to clipboard:", err);
+      }
+    }
+  };
 
   // Reset visibility states when puzzle changes
   useEffect(() => {
@@ -136,8 +162,16 @@ export default function PuzzleDetail({
             <button
               onClick={() => toggleFavorite(puzzle.puzzleId)}
               className={`p-2 border transition-all ${isFavorite ? "bg-[var(--fg)] text-[var(--bg)] border-[var(--fg)]" : "border-[var(--border)] text-[var(--muted-fg)] hover:text-[var(--fg)] hover:border-[var(--fg)]"}`}
+              title={isFavorite ? "Remove from Favorites" : "Save to Favorites"}
             >
               <Star className={`w-4 h-4 ${isFavorite ? "fill-current" : ""}`} />
+            </button>
+            <button
+              onClick={handleShare}
+              className="p-2 border border-[var(--border)] text-[var(--muted-fg)] hover:text-[var(--fg)] hover:border-[var(--fg)] transition-all"
+              title="Share Puzzle"
+            >
+              <Share2 className="w-4 h-4" />
             </button>
             <button
               onClick={() => toggleSolved(puzzle.puzzleId)}
