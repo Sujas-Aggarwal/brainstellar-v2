@@ -9,8 +9,8 @@ export const meta: Route.MetaFunction = () => [
   { name: "keywords", content: "free interview puzzles, brainstellar, interview puzzles, puzzle questions for interview, puzzles asked in interviews, quant interview puzzles, HFT interview questions, SDE puzzles, coding interview brain teasers, maths puzzles for developers, programmer brain teasers, tech job puzzles" },
   { property: "og:title", content: "Free Interview Puzzle Preparation | Brainfuck" },
   { property: "og:description", content: "Learn more about Brainfuck, the ultimate free resource for Quant, HFT, and SDE interview puzzles." },
-  { property: "og:url", content: "https://brainfuck.site/about" },
-  { rel: "canonical", href: "https://brainfuck.site/about" },
+  { property: "og:url", content: "https://www.brainfuck.online/about" },
+  { rel: "canonical", href: "https://www.brainfuck.online/about" },
 ];
 
 export default function About() {

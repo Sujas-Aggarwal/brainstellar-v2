@@ -18,8 +18,8 @@ export const meta: Route.MetaFunction = ({ params }: { params: any }) => {
     { name: "description", content: `Prepare for Quant, HFT, and SDE interviews with 100+ free ${topic} puzzles. High-quality solutions and tracking for top tech job interviews.` },
     { name: "keywords", content: `puzzles for interview, brainstellar, interview puzzles, puzzle questions for interview, puzzles asked in interviews, ${topic} puzzles, tech job puzzles` },
     { property: "og:title", title },
-    { property: "og:url", content: "https://brainfuck.site" },
-    { rel: "canonical", href: "https://brainfuck.site" },
+    { property: "og:url", content: "https://www.brainfuck.online" },
+    { rel: "canonical", href: "https://www.brainfuck.online" },
     { name: "robots", content: "index, follow" },
   ];
 };
@@ -164,13 +164,13 @@ export default function Home() {
     "@type": "CollectionPage",
     "name": "Interview Puzzles Archive",
     "description": "A collection of 100+ free high-quality logic puzzles for Quant, HFT, and SDE interviews.",
-    "url": "https://brainfuck.site",
+    "url": "https://www.brainfuck.online",
     "mainEntity": {
       "@type": "ItemList",
       "itemListElement": filteredPuzzles.slice(0, 10).map((p, i) => ({
         "@type": "ListItem",
         "position": i + 1,
-        "url": `https://brainfuck.site/puzzles/${p.puzzleId}`,
+        "url": `https://www.brainfuck.online/puzzles/${p.puzzleId}`,
         "name": p.title
       }))
     }

@@ -8,8 +8,8 @@ export const meta: Route.MetaFunction = () => [
   { title: "Submit a Puzzle | Brainfuck" },
   { name: "description", content: "Contribute to the Brainfuck archive. Submit high-quality logic puzzles for Quant, HFT, and SDE interview preparation." },
   { property: "og:title", content: "Submit a Puzzle | Brainfuck" },
-  { property: "og:url", content: "https://brainfuck.site/submit" },
-  { rel: "canonical", href: "https://brainfuck.site/submit" },
+  { property: "og:url", content: "https://www.brainfuck.online/submit" },
+  { rel: "canonical", href: "https://www.brainfuck.online/submit" },
 ];
 
 export default function Submit() {

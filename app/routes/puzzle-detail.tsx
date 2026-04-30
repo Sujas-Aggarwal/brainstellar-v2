@@ -34,9 +34,9 @@ export const meta: Route.MetaFunction = ({ data }) => {
     },
     { property: "og:title", content: `${puzzle.title} | Interview Puzzle Solution` },
     { property: "og:description", content: `Step-by-step solution for ${puzzle.title}. A ${puzzle.difficulty} level ${puzzle.category} puzzle for interview prep.` },
-    { property: "og:url", content: `https://brainfuck.sujas.me/puzzles/${puzzle.puzzleId}` },
+    { property: "og:url", content: `https://www.brainfuck.online/puzzles/${puzzle.puzzleId}` },
     { property: "og:type", content: "article" },
-    { rel: "canonical", href: `https://brainfuck.sujas.me/puzzles/${puzzle.puzzleId}` },
+    { rel: "canonical", href: `https://www.brainfuck.online/puzzles/${puzzle.puzzleId}` },
   ];
 };
 
@@ -64,7 +64,7 @@ export default function PuzzleDetail({
   const isFavorite = favoritePuzzles.includes(puzzle.puzzleId);
 
   const handleShare = async () => {
-    const shareUrl = `https://brainfuck.sujas.me/puzzles/${puzzle.puzzleId}`;
+    const shareUrl = `https://www.brainfuck.online/puzzles/${puzzle.puzzleId}`;
 
     if (navigator.share) {
       try {
