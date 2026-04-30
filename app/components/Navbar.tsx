@@ -88,7 +88,7 @@ export function Navbar() {
           <div className="w-px h-4 bg-[var(--border)] mx-2 hidden sm:block" />
 
           <a
-            href="https://github.com/Sujas-Aggarwal/brainfuck-v2"
+            href="https://github.com/Sujas-Aggarwal/brainstellar-v2"
             target="_blank"
             rel="noopener noreferrer"
             className="p-2 hover:bg-[var(--fg)] hover:text-[var(--bg)] transition-colors"
