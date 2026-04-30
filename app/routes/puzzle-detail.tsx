@@ -316,7 +316,7 @@ export default function PuzzleDetail({
           className={`transition-all duration-700 ease-in-out overflow-hidden ${showComments ? "max-h-[5000px] opacity-100" : "max-h-0 opacity-0"}`}
         >
           <div className="pt-12 mt-12 border-t border-[var(--border)]">
-            <Comments puzzleId={puzzle.puzzleId} puzzleTitle={puzzle.title} />
+            <Comments puzzleId={puzzle.puzzleId} />
           </div>
         </div>
       </main>

@@ -37,7 +37,7 @@ export default function Discuss() {
 
         <div className={`transition-all duration-700 ease-in-out overflow-hidden ${showComments ? "max-h-[5000px] opacity-100" : "max-h-0 opacity-0"}`}>
           <div className="pt-12 mt-4 border-t border-[var(--border)]">
-            <Comments issueTerm="Global Discussion Archive" />
+            <Comments />
           </div>
         </div>
       </div>

@@ -1,4 +1,17 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
+import { 
+  onAuthStateChanged, 
+  signInWithPopup, 
+  signOut as firebaseSignOut, 
+  type User 
+} from "firebase/auth";
+import { 
+  doc, 
+  getDoc, 
+  setDoc, 
+  onSnapshot 
+} from "firebase/firestore";
+import { auth, db, googleProvider } from "~/lib/firebase";
 
 interface UserData {
   solvedPuzzles: number[];
@@ -6,10 +19,11 @@ interface UserData {
   theme: "light" | "dark";
 }
 
-interface UserContextType {
-  solvedPuzzles: number[];
-  favoritePuzzles: number[];
-  theme: "light" | "dark";
+interface UserContextType extends UserData {
+  user: User | null;
+  loading: boolean;
+  signIn: () => Promise<void>;
+  signOut: () => Promise<void>;
   toggleSolved: (id: number) => void;
   toggleFavorite: (id: number) => void;
   toggleTheme: () => void;
@@ -22,32 +36,112 @@ const UserContext = createContext<UserContextType | undefined>(undefined);
 const STORAGE_KEY = "brainfuck_user_data_v2";
 
 export function UserProvider({ children }: { children: React.ReactNode }) {
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
   const [data, setData] = useState<UserData>({
     solvedPuzzles: [],
     favoritePuzzles: [],
     theme: "dark",
   });
 
+  // Listen for auth state changes
   useEffect(() => {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        setData(parsed);
-      } catch (e) {
-        console.error("Failed to parse saved data", e);
-      }
-    }
+    console.log("Setting up Auth listener...");
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      console.log("Auth state changed:", currentUser?.email || "No user");
+      setUser(currentUser);
+      setLoading(false);
+    }, (error) => {
+      console.error("Auth listener error:", error);
+      setLoading(false);
+    });
+    return () => unsubscribe();
   }, []);
 
+  // Sync with Firestore if logged in, otherwise localStorage
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    if (user) {
+      console.log("Syncing with Firestore for user:", user.uid);
+      const userDocRef = doc(db, "users", user.uid);
+      const unsubscribe = onSnapshot(userDocRef, (doc) => {
+        if (doc.exists()) {
+          const userData = doc.data() as Partial<UserData>;
+          console.log("Firestore data received:", userData);
+          setData(prev => ({
+            ...prev,
+            solvedPuzzles: userData.solvedPuzzles || [],
+            favoritePuzzles: userData.favoritePuzzles || [],
+          }));
+        } else {
+          console.log("No user doc found, creating one...");
+          // Initialize user doc if it doesn't exist
+          setDoc(userDocRef, {
+            solvedPuzzles: data.solvedPuzzles,
+            favoritePuzzles: data.favoritePuzzles,
+            email: user.email,
+            displayName: user.displayName,
+          }, { merge: true }).catch(err => console.error("Error creating user doc:", err));
+        }
+      }, (error) => {
+        console.error("Firestore sync error:", error);
+      });
+      return () => unsubscribe();
+    } else {
+      console.log("No user, loading from localStorage...");
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          setData(prev => ({ ...prev, ...parsed }));
+        } catch (e) {
+          console.error("Failed to parse saved data", e);
+        }
+      }
+    }
+  }, [user]);
+
+  // Persist local changes to storage/firestore
+  useEffect(() => {
+    if (!user) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({
+        solvedPuzzles: data.solvedPuzzles,
+        favoritePuzzles: data.favoritePuzzles,
+        theme: data.theme
+      }));
+    } else {
+      const userDocRef = doc(db, "users", user.uid);
+      setDoc(userDocRef, {
+        solvedPuzzles: data.solvedPuzzles,
+        favoritePuzzles: data.favoritePuzzles,
+      }, { merge: true }).catch(err => console.error("Error updating user doc:", err));
+    }
+
     if (data.theme === "dark") {
       document.documentElement.classList.add("dark");
     } else {
       document.documentElement.classList.remove("dark");
     }
-  }, [data]);
+  }, [data, user]);
+
+  const signIn = async () => {
+    console.log("Initiating Google Sign-In...");
+    try {
+      const result = await signInWithPopup(auth, googleProvider);
+      console.log("Sign-in successful:", result.user.email);
+    } catch (error) {
+      console.error("Sign in failed:", error);
+    }
+  };
+
+  const signOut = async () => {
+    console.log("Initiating Sign-Out...");
+    try {
+      await firebaseSignOut(auth);
+      console.log("Sign-out successful");
+    } catch (error) {
+      console.error("Sign out failed:", error);
+    }
+  };
 
   const toggleSolved = (id: number) => {
     setData(prev => ({
@@ -97,6 +191,10 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
   return (
     <UserContext.Provider value={{ 
       ...data,
+      user,
+      loading,
+      signIn,
+      signOut,
       toggleSolved, 
       toggleFavorite,
       toggleTheme,

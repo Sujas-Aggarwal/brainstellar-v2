@@ -1,9 +1,9 @@
 import { Link } from "react-router";
 import { useUser } from "~/contexts/UserContext";
-import { Sun, Moon, Hash, Info, MessageSquare } from "lucide-react";
+import { Sun, Moon, Hash, Info, MessageSquare, User as UserIcon } from "lucide-react";
 
 export function Navbar() {
-  const { theme, toggleTheme } = useUser();
+  const { theme, toggleTheme, user, loading, signIn, signOut } = useUser();
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-[var(--bg)] border-b border-[var(--border)]">
@@ -47,8 +47,48 @@ export function Navbar() {
 
           <div className="w-px h-4 bg-[var(--border)] mx-1" />
 
+          {loading ? (
+            <div className="w-8 h-8 rounded-full bg-[var(--border)] animate-pulse" />
+          ) : user ? (
+            <div className="flex items-center gap-3 ml-2">
+              {(() => {
+                console.log("User photoURL:", user.photoURL);
+                return null;
+              })()}
+              <div className="relative group/avatar w-8 h-8">
+                {user.photoURL ? (
+                  <img 
+                    src={user.photoURL} 
+                    alt={user.displayName || "User"} 
+                    className="w-full h-full rounded-full border border-[var(--border)] object-cover shadow-sm transition-transform group-hover/avatar:scale-105"
+                    referrerPolicy="no-referrer"
+                  />
+                ) : (
+                  <div className="w-full h-full rounded-full bg-[var(--muted-bg)] flex items-center justify-center border border-[var(--border)]">
+                    <UserIcon className="w-4 h-4 text-[var(--muted-fg)]" />
+                  </div>
+                )}
+              </div>
+              <button
+                onClick={signOut}
+                className="text-[10px] font-bold uppercase tracking-widest hover:text-red-500 transition-colors"
+              >
+                Logout
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={signIn}
+              className="ml-2 px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest border border-[var(--fg)] hover:bg-[var(--fg)] hover:text-[var(--bg)] transition-all"
+            >
+              Login
+            </button>
+          )}
+
+          <div className="w-px h-4 bg-[var(--border)] mx-2 hidden sm:block" />
+
           <a
-            href="https://github.com/Sujas-Aggarwal/brainstellar-v2"
+            href="https://github.com/Sujas-Aggarwal/brainfuck-v2"
             target="_blank"
             rel="noopener noreferrer"
             className="p-2 hover:bg-[var(--fg)] hover:text-[var(--bg)] transition-colors"
