@@ -1128,5 +1128,155 @@
     "answer": "50",
     "solution": "Each time we draw, there could be a possible color-switch, except the first time we draw, hence 99 possible switches.\n\n Let $X_i$ be an indicator variable, value 1 if $i_{th}$ position has a colour change and zero otherwise, note that $i$ goes from $1$ to $99$.\n\n Total number of switches, $S = X_1 + X_2 + ... + X_{99} = \\sum_{i=1}^{99} X_i$\n\n The expected number of color switches is denoted by the sum of these variables, i.e $E[S] = E[X_1 + X_2 + ... + X_{99}]$\n\n Linearity of expectation states that the expected value of the sum of random variables is equal to the sum of their individual expected values.\n\n Hence the answer is $E[S] = E[X_1] + E[X_2] + ... + E[X_{99}]$ \n\n Note that each $X_i$ is identical, and the expected value is equal for each $i$, i.e, $E(X_k) = E(X_1) $\n\n Hence $E[S] = E[X_1] + ... + E[X_n] = \\sum_{i=1}^{99} E[X_1] = 99 \\cdot E[X_1] $\n\n Also, we can calculate the expected value, $E[X_1] = 1 \\cdot P(X_1 = 1) + 0 \\cdot P(X_1 = 0) = P(X_1 =1) $\n\n Probability of any given color change is (either first is R second is B, or first is B and second is R) $= P(X_1 = 1)= \\dfrac{50}{100} \\cdot \\dfrac{50}{99} + \\dfrac{50}{100} \\cdot \\dfrac{50}{99} = 50/99$\n\n Finally, the answer is $ E[S] = \\sum_{i=1}^{99} E[X_i] = 99 \\cdot E[X_1] = 99 \\cdot 50/99 = 50$ \n\n---\n\n**Note**:\n$X_i$'s are not independent, but since all the balls are drawn randomly, the probability-distribution is identical for each draw. For instance, if you are given no information about the previous colors, and I ask 'what is the probability that 5th draw has a color change?', your answer will not depend on '5', instead the answer will be same for any index.",
     "source": "Placement test"
+  },
+  {
+    "puzzleId": 102,
+    "title": "Three Doors Twist",
+    "difficulty": "easy",
+    "category": "probability",
+    "question": "There are 3 doors: behind one is a prize. You pick one. Instead of opening a goat door, the host randomly opens one of the remaining doors (could be prize). If it's not the prize, should you switch?",
+    "hint": "Host behavior is different from Monty Hall.",
+    "answer": "No advantage, probability becomes 1/2",
+    "solution": "Since the host does not guarantee opening a goat door, conditional probability changes. If a goat is revealed, remaining doors are symmetric → probability = 1/2."
+  },
+  {
+    "puzzleId": 103,
+    "title": "100 Prisoners Boxes",
+    "difficulty": "hard",
+    "category": "strategy",
+    "question": "100 prisoners must find their own number in 100 boxes. Each can open 50 boxes. If all succeed, they are freed. Strategy?",
+    "hint": "Think permutation cycles.",
+    "answer": "Follow cycles starting from own number",
+    "solution": "Each prisoner starts at their own index and follows the chain. Success probability ~31%, much higher than random."
+  },
+  {
+    "puzzleId": 104,
+    "title": "Bridge Crossing",
+    "difficulty": "easy",
+    "category": "strategy",
+    "question": "4 people with times 1, 2, 5, 10 must cross a bridge at night with one torch. Only two at a time. Min total time?",
+    "hint": "Fastest person should shuttle.",
+    "answer": "17 minutes",
+    "solution": "1&2 cross (2), 1 back (1), 5&10 cross (10), 2 back (2), 1&2 cross (2) → total 17."
+  },
+  {
+    "puzzleId": 105,
+    "title": "Two Envelopes",
+    "difficulty": "medium",
+    "category": "probability",
+    "question": "You pick one of two envelopes, one has twice the money of the other. You see X. Should you switch?",
+    "hint": "Expectation paradox",
+    "answer": "No clear advantage",
+    "solution": "Naive expectation suggests switching always helps, but reasoning is flawed due to conditional probabilities."
+  },
+  {
+    "puzzleId": 106,
+    "title": "Poison Bottles",
+    "difficulty": "medium",
+    "category": "logic",
+    "question": "1000 bottles, one poisoned. You have 10 rats. Poison kills in 1 hour. Identify bottle in 1 hour.",
+    "hint": "Binary encoding",
+    "answer": "Use binary representation",
+    "solution": "Label bottles 1–1000 in binary. Each rat represents a bit. Feed accordingly. Dead rats encode bottle number."
+  },
+  {
+    "puzzleId": 107,
+    "title": "Missing Dollar",
+    "difficulty": "easy",
+    "category": "general",
+    "question": "3 people pay ₹30 total. Hotel keeps ₹25, returns ₹5. Bellboy keeps ₹2, gives ₹1 each back. Now each paid ₹9 → ₹27 + ₹2 = ₹29. Where is ₹1?",
+    "hint": "Wrong addition",
+    "answer": "No money missing",
+    "solution": "₹27 already includes ₹2 kept by bellboy. Correct equation: ₹25 + ₹2 + ₹3 = ₹30."
+  },
+  {
+    "puzzleId": 108,
+    "title": "Cheryl's Birthday",
+    "difficulty": "medium",
+    "category": "logic",
+    "question": "Albert knows month, Bernard knows day. After statements, both deduce birthday. Find it.",
+    "hint": "Eliminate impossible cases step by step",
+    "answer": "July 16",
+    "solution": "Classic elimination puzzle based on knowledge states."
+  },
+  {
+    "puzzleId": 109,
+    "title": "Infinite Hotel",
+    "difficulty": "easy",
+    "category": "discrete",
+    "question": "A hotel with infinite rooms is full. Can it accommodate one more guest?",
+    "hint": "Shift guests",
+    "answer": "Yes",
+    "solution": "Move guest from room n → n+1, freeing room 1."
+  },
+  {
+    "puzzleId": 110,
+    "title": "Handshake Problem",
+    "difficulty": "easy",
+    "category": "discrete",
+    "question": "In a room of n people, everyone shakes hands once. Total handshakes?",
+    "hint": "Pair counting",
+    "answer": "n(n−1)/2",
+    "solution": "Each pair counted once → combinations C(n,2)."
+  },
+  {
+    "puzzleId": 111,
+    "title": "Water Jug",
+    "difficulty": "easy",
+    "category": "logic",
+    "question": "You have 3L and 5L jugs. Measure exactly 4L.",
+    "hint": "Fill, pour, repeat",
+    "answer": "Yes",
+    "solution": "Fill 5L → pour into 3L → left 2L → empty 3L → transfer 2L → refill 5L → pour → leaves 4L."
+  },
+  {
+    "puzzleId": 112,
+    "title": "Blue Eyes Island",
+    "difficulty": "hard",
+    "category": "logic",
+    "question": "People see others’ eye colors but not their own. Announcement: at least one has blue eyes. What happens?",
+    "hint": "Induction logic",
+    "answer": "All blue-eyed leave on nth day",
+    "solution": "Classic recursive reasoning puzzle."
+  },
+  {
+    "puzzleId": 113,
+    "title": "Random Triangle",
+    "difficulty": "medium",
+    "category": "probability",
+    "question": "Pick 3 random points on a circle. Probability triangle is acute?",
+    "hint": "Largest arc < semicircle",
+    "answer": "1/4",
+    "solution": "Triangle is obtuse if points lie within semicircle → probability 3/4, so acute = 1/4."
+  },
+  {
+    "puzzleId": 114,
+    "title": "Coin Line Game",
+    "difficulty": "medium",
+    "category": "strategy",
+    "question": "Coins in a line, players pick from ends. Maximize value. Strategy?",
+    "hint": "DP / parity",
+    "answer": "Choose parity with higher sum",
+    "solution": "Optimal play ensures selecting larger parity set."
+  },
+  {
+    "puzzleId": 115,
+    "title": "Broken Stick",
+    "difficulty": "easy",
+    "category": "probability",
+    "question": "Break stick at 2 random points. Probability pieces form triangle?",
+    "hint": "No piece > 1/2",
+    "answer": "1/4",
+    "solution": "All segments must be < half length → probability = 1/4."
+  },
+  {
+    "puzzleId": 116,
+    "title": "Elevator Puzzle",
+    "difficulty": "easy",
+    "category": "general",
+    "question": "A man in 10th floor uses elevator to go down always, but while returning goes to 7th floor then walks. Why?",
+    "hint": "Height matters",
+    "answer": "He is short",
+    "solution": "He cannot reach higher buttons."
   }
 ]
