@@ -13,6 +13,7 @@ import {
   serverTimestamp 
 } from "firebase/firestore";
 import { auth, db, googleProvider } from "~/lib/firebase";
+import { identifyUser, resetUser, trackEvent } from "~/lib/posthog";
 
 interface UserData {
   solvedPuzzles: number[];
@@ -127,6 +128,11 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
         });
 
         setUser(currentUser);
+        identifyUser(currentUser.uid, {
+          email: currentUser.email,
+          displayName: currentUser.displayName,
+        });
+        trackEvent('user_logged_in');
         setLoading(false);
         return () => unsubSnapshot();
       } else {
@@ -148,6 +154,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
           setData(prev => ({ ...prev, solvedPuzzles: [], favoritePuzzles: [] }));
         }
         setUser(null);
+        resetUser();
         setLoading(false);
       }
     });
@@ -191,6 +198,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     console.log("Initiating Sign-Out...");
     try {
       await firebaseSignOut(auth);
+      trackEvent('user_logged_out');
       console.log("Sign-out successful");
     } catch (error) {
       console.error("Sign out failed:", error);

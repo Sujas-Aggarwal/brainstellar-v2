@@ -8,7 +8,9 @@ import {
   ScrollRestoration,
 } from "react-router";
 import { useState, useEffect } from "react";
+import { useLocation } from "react-router";
 import { ExternalLink, Globe, ShieldAlert, X } from "lucide-react";
+import { initPostHog, trackEvent } from "~/lib/posthog";
 
 import type { Route } from "./+types/root";
 import { UserProvider } from "./contexts/UserContext";
@@ -117,6 +119,16 @@ export default function App() {
   const [showMigrationModal, setShowMigrationModal] = useState(false);
   const [isAvailable, setIsAvailable] = useState<boolean | null>(null);
   const [checking, setChecking] = useState(false);
+
+  const location = useLocation();
+
+  useEffect(() => {
+    initPostHog();
+  }, []);
+
+  useEffect(() => {
+    trackEvent('$pageview');
+  }, [location]);
 
   useEffect(() => {
     const hostname = window.location.hostname;

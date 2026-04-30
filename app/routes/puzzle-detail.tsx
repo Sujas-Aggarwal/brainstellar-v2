@@ -17,6 +17,7 @@ import {
   MessageSquare,
   Share2,
 } from "lucide-react";
+import { trackEvent } from "~/lib/posthog";
 import type { Route } from "./+types/puzzle-detail";
 
 export const meta: Route.MetaFunction = ({ data }) => {
@@ -87,6 +88,16 @@ export default function PuzzleDetail({
       }
     }
   };
+
+  // Track puzzle view
+  useEffect(() => {
+    trackEvent('puzzle_viewed', {
+      puzzleId: puzzle.puzzleId,
+      title: puzzle.title,
+      difficulty: puzzle.difficulty,
+      category: puzzle.category,
+    });
+  }, [puzzle.puzzleId]);
 
   // Reset visibility states when puzzle changes
   useEffect(() => {
@@ -161,21 +172,21 @@ export default function PuzzleDetail({
           <div className="flex items-center gap-4">
             <button
               onClick={() => toggleFavorite(puzzle.puzzleId)}
-              className={`p-2 border transition-all ${isFavorite ? "bg-[var(--fg)] text-[var(--bg)] border-[var(--fg)]" : "border-[var(--border)] text-[var(--muted-fg)] hover:text-[var(--fg)] hover:border-[var(--fg)]"}`}
+              className={`p-2 border transition-all ${isFavorite ? "bg-(--fg) text-(--bg) border-(--fg)" : "border-(--border) text-(--muted-fg) hover:text-(--fg) hover:border-(--fg)"}`}
               title={isFavorite ? "Remove from Favorites" : "Save to Favorites"}
             >
               <Star className={`w-4 h-4 ${isFavorite ? "fill-current" : ""}`} />
             </button>
             <button
               onClick={handleShare}
-              className="p-2 border border-[var(--border)] text-[var(--muted-fg)] hover:text-[var(--fg)] hover:border-[var(--fg)] transition-all"
+              className="p-2 border border-(--border) text-(--muted-fg) hover:text-(--fg) hover:border-(--fg) transition-all"
               title="Share Puzzle"
             >
               <Share2 className="w-4 h-4" />
             </button>
             <button
               onClick={() => toggleSolved(puzzle.puzzleId)}
-              className={`flex items-center gap-2 px-4 py-2 border font-bold uppercase text-[10px] tracking-widest transition-all ${isSolved ? "bg-[var(--c-easy)]/10 text-[var(--c-easy)] border-[var(--c-easy)]" : "border-[var(--border)] text-[var(--muted-fg)] hover:text-[var(--fg)] hover:border-[var(--fg)]"}`}
+              className={`flex items-center gap-2 px-4 py-2 border font-bold uppercase text-[10px] tracking-widest transition-all ${isSolved ? "bg-(--c-easy)/10 text-(--c-easy) border-(--c-easy)" : "border-(--border) text-(--muted-fg) hover:text-(--fg) hover:border-(--fg)"}`}
             >
               <CheckCircle className="w-3.5 h-3.5" />
               {isSolved ? "Conquered" : "Mark Solved"}
@@ -225,23 +236,37 @@ export default function PuzzleDetail({
         <div className="space-y-8">
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <button
-              onClick={() => setShowHint(!showHint)}
+              onClick={() => {
+                const newState = !showHint;
+                setShowHint(newState);
+                if (newState) {
+                  trackEvent('puzzle_hint_viewed', { puzzleId: puzzle.puzzleId, title: puzzle.title });
+                }
+              }}
               className={`py-4 border-2 font-bold uppercase tracking-[0.2em] text-[10px] transition-all ${showHint ? "bg-[var(--bg)] border-[var(--fg)] text-[var(--fg)]" : "bg-[var(--muted)] border-[var(--border)] text-[var(--muted-fg)] hover:border-[var(--fg)] hover:text-[var(--fg)]"}`}
             >
               {showHint ? "Hide Hint" : "Get a Hint"}
             </button>
             <button
-              onClick={() => setShowAnswer(!showAnswer)}
+              onClick={() => {
+                const newState = !showAnswer;
+                setShowAnswer(newState);
+                if (newState) {
+                  trackEvent('puzzle_answer_viewed', { puzzleId: puzzle.puzzleId, title: puzzle.title });
+                }
+              }}
               className={`py-4 border-2 font-bold uppercase tracking-[0.2em] text-[10px] transition-all ${showAnswer ? "bg-[var(--bg)] border-[var(--fg)] text-[var(--fg)]" : "bg-[var(--muted)] border-[var(--border)] text-[var(--muted-fg)] hover:border-[var(--fg)] hover:text-[var(--fg)]"}`}
             >
               {showAnswer ? "Hide Answer" : "See Answer"}
             </button>
             <button
               onClick={() => {
-                setShowSolution(!showSolution);
-                if (!showSolution) {
+                const newState = !showSolution;
+                setShowSolution(newState);
+                if (newState) {
                   setShowHint(true);
                   setShowAnswer(true);
+                  trackEvent('puzzle_solution_viewed', { puzzleId: puzzle.puzzleId, title: puzzle.title });
                 }
               }}
               className={`py-4 border-2 font-bold uppercase tracking-[0.2em] text-[10px] transition-all ${showSolution ? "bg-[var(--bg)] border-[var(--fg)] text-[var(--fg)]" : "bg-[var(--fg)] border-[var(--fg)] text-[var(--bg)] hover:opacity-90"}`}
