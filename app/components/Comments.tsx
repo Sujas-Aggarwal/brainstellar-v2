@@ -54,7 +54,7 @@ export function Comments({
       fetchedComments.sort((a, b) => {
         const timeA = a.createdAt?.toMillis() || 0;
         const timeB = b.createdAt?.toMillis() || 0;
-        return timeA - timeB;
+        return timeB - timeA;
       });
       
       setComments(fetchedComments);
