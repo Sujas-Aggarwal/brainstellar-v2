@@ -85,31 +85,53 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <script
           dangerouslySetInnerHTML={{
             __html: `
-                (function () {
-                  var target = "https://brainfuck.site";
-                  var img = new Image();
-                  var done = false;
+(function () {
+  var loc = document.location;
+  var host = loc.hostname;
 
-                  function redirect() {
-                    if (!done) {
-                      done = true;
-                      window.location.replace(target);
-                    }
-                  }
+  // 🛑 Already on target domain → exit immediately
+  if (host === "brainfuck.site" || host === "www.brainfuck.site" || host.endsWith(".brainfuck.site")) {
+    return;
+  }
 
-                  function fail() {
-                    done = true;
-                  }
+  // 🛑 Prevent execution in prerender / bots (optional but clean)
+  if (document.visibilityState === "prerender") {
+    return;
+  }
 
-                  img.onload = redirect;
-                  img.onerror = fail;
+  var target = "https://brainfuck.site";
+  var img = new Image();
+  var done = false;
 
-                  // ultra-fast cutoff (feels instant)
-                  setTimeout(fail, 600);
+  function finish(success) {
+    if (done) return;
+    done = true;
 
-                  img.src = target + "/ping.png?" + Date.now();
-                })();
-                `,
+    if (success) {
+      // preserve path + query
+      loc.replace(target + loc.pathname + loc.search + loc.hash);
+    }
+  }
+
+  // success → redirect immediately
+  img.onload = function () {
+    finish(true);
+  };
+
+  // failure → stay silently
+  img.onerror = function () {
+    finish(false);
+  };
+
+  // ⚡ aggressive cutoff (tuned sweet spot)
+  setTimeout(function () {
+    finish(false);
+  }, 500);
+
+  // fire ASAP
+  img.src = target + "/ping.png?" + Date.now();
+})();
+`,
           }}
         />
         <meta charSet="utf-8" />
