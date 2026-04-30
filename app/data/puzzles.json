@@ -362,7 +362,7 @@
     "programmingVariant": "Following is the programming version of this question:\n\nFunction `f1()` returns `true` or `false` with 50% probability each, define function `f2()` that can return `true` with 25% probability, and `false` otherwise. You may use the function `f1`.\n\nThis can be answered using the **and gate**.\n\n```python\ndef f2(): \n  return f1() and f1()\n```\n\n\n<!-- \nAuthor's Notes\n\nEssentially, we have been given a fair coin that gives heads with probability of 1/2, and we want to come up with a new event that has probability of 1/4. Some candidates try to use $X/2$, which translates to \"Half Heads\", same as the title of this question.\n\n-->"
   },
   {
-    "puzzleId": 101,
+    "puzzleId": 33,
     "title": "Drunk Passenger",
     "difficulty": "medium",
     "category": "probability",
@@ -375,7 +375,7 @@
     "script": "Not convinced? Simulate using this\n[Colab Script](https://colab.research.google.com/gist/varun-seth/631aa48d025c1838eab398bb1db730de/101_drunk_passenger.ipynb#sandboxMode=true)"
   },
   {
-    "puzzleId": 102,
+    "puzzleId": 34,
     "title": "Stick to Triangle",
     "difficulty": "medium",
     "category": "probability",
@@ -387,7 +387,7 @@
     "comment": "Question 5 here: http://www.isds.duke.edu/courses/Fall05/sta104/hw/hw08sol.pdf"
   },
   {
-    "puzzleId": 103,
+    "puzzleId": 35,
     "title": "Rabbit on the Staircase",
     "difficulty": "medium",
     "category": "discrete",
@@ -397,7 +397,7 @@
     "solution": "Suppose f(n) are the number of ways to reach nth stair. Notice that the final hop is either a single jump or double jump, i.e. its from (n-1)th stair or (n-2)th. Thus f(n) = f(n-1) + f(n-2), where f(0)=f(1)=1.  This is Fibonacci sequence."
   },
   {
-    "puzzleId": 104,
+    "puzzleId": 36,
     "title": "Sharing Wood",
     "difficulty": "medium",
     "category": "discrete",
@@ -408,7 +408,7 @@
     "source": "CSEblog"
   },
   {
-    "puzzleId": 105,
+    "puzzleId": 37,
     "title": "Infinity & Beyond",
     "difficulty": "medium",
     "category": "strategy",
@@ -419,7 +419,7 @@
     "source": "CSEblog"
   },
   {
-    "puzzleId": 106,
+    "puzzleId": 38,
     "title": "Chuck a Luck",
     "difficulty": "medium",
     "category": "probability",
@@ -430,7 +430,7 @@
     "source": "50 puzzles in prob"
   },
   {
-    "puzzleId": 107,
+    "puzzleId": 39,
     "title": "MULTILINGUAL",
     "difficulty": "medium",
     "category": "discrete",
@@ -441,7 +441,7 @@
     "source": "Quantnet"
   },
   {
-    "puzzleId": 108,
+    "puzzleId": 40,
     "title": "Guess the Toss",
     "difficulty": "medium",
     "category": "probability",
@@ -452,7 +452,7 @@
     "source": "Top Quant Interview"
   },
   {
-    "puzzleId": 109,
+    "puzzleId": 41,
     "title": "Pattern on Snowflakes",
     "difficulty": "medium",
     "category": "probability",
@@ -464,7 +464,7 @@
     "comment": ""
   },
   {
-    "puzzleId": 110,
+    "puzzleId": 42,
     "title": "King's Salary",
     "difficulty": "medium",
     "category": "strategy",
@@ -475,7 +475,7 @@
     "source": "P. Winkler"
   },
   {
-    "puzzleId": 111,
+    "puzzleId": 43,
     "title": "Counting on friends",
     "difficulty": "medium",
     "category": "discrete",
@@ -486,7 +486,7 @@
     "source": "Top Quant Interview"
   },
   {
-    "puzzleId": 112,
+    "puzzleId": 44,
     "title": "Random Ratio",
     "difficulty": "medium",
     "category": "probability",
@@ -497,7 +497,7 @@
     "source": "Written Test"
   },
   {
-    "puzzleId": 114,
+    "puzzleId": 45,
     "title": "Second Chance",
     "difficulty": "medium",
     "category": "probability",
@@ -508,7 +508,7 @@
     "source": "CSEblog"
   },
   {
-    "puzzleId": 115,
+    "puzzleId": 46,
     "title": "Innocent Monkey",
     "difficulty": "medium",
     "category": "probability",
@@ -522,7 +522,7 @@
     "source": "Self, to show an example of recursive probability"
   },
   {
-    "puzzleId": 116,
+    "puzzleId": 47,
     "title": "Consecutive Heads",
     "difficulty": "medium",
     "category": "probability",
@@ -537,7 +537,7 @@
     "source": "Top Quant Interview"
   },
   {
-    "puzzleId": 117,
+    "puzzleId": 48,
     "title": "Chess Tournament",
     "difficulty": "medium",
     "category": "probability",
@@ -547,7 +547,7 @@
     "solution": "Consider $K=1, N=2$, the probability is 1.\n\nConsider $K=2, N=4$; the first round can be in the following ways:\n\n1. $(P_1 \\times P_2 ) \\times ( P_3 \\times P_4 )$\n2. $(P_1 \\times P_3 ) \\times ( P_2 \\times P_4 )$\n3. $(P_1 \\times P_4 ) \\times ( P_2 \\times P_3 )$\n\nThey don't meet in finals in the first case (out of a total of three). Thus, for $K=2, N=4$, the probability that they meet is $2/3$.\n<!-- \nI assure you that this probability gets close to 1/2 for large K. \n -->\n\nAssume that instead of forming random pairs at each level, we have already constructed a \"tournament tree\", which is a binary tree. At the bottom of this structure, we have the initial $N$ players. Each node represents the match between the two children (players), and the value of each node is the player who won that match. The value of the top-level root node is the overall winner of the tournament.\n\n![tree](/assets/images/117_tree.drawio.png)\n\nWith this image, we can see the whole tournament is deterministic and only depends on the initial arrangement of players (at the bottom level).\nWe also notice that the two players who reach the final level are the best players of the left half of the tree and the right of the tree (respectively).\n\nImagine $N$ players getting partitioned into two groups of $N/2$ players each, with player $P_1$ topping in the first group and player $P_2$ in the second. The best player of each partition reaches the final. The probability that a random partition separates player $P_1$ from $P_2$ is $\\dfrac{(N/2)}{(N-1)}$\n\nHere's how: There are $N$ empty slots in a sequence at the bottom layer of the tournament tree.\nWe can start assigning players from $P_1$.\nSuppose $P_1$ is assigned to a slot in the first half. For $P_2$, there are total $N-1$ slots remaining, and $N/2$ are in a new group (that does not contain $P_1$). Hence, there are $(N/2)$ favorable choices and $N-1$ total choices.\n\nHence the probability is $\\dfrac{N}{2(N-1)}$\n\n<!--\nIntuitively, this means for creating a partition to separate them, we pick $(N/2)$ people from $N$, wishing to take player 1, but not player 2.  \n-->\n---\n\nNote: The question says that we are forming random pairs at each level. But that is equivalent to retroactively constructing the bottom-layer of the tournament tree, in any desirable fashion.\n\nFor example, consider at the $i$th level, we randomly decide to match $P_j$ with $P_k$, even though they were not siblings in the tree at that level.\nThat's fine, we can modify the tree such that now $P_j$ and $P_k$ are siblings, while keeping the entire branch below each of those nodes intact."
   },
   {
-    "puzzleId": 118,
+    "puzzleId": 49,
     "title": "Number of Double Heads",
     "difficulty": "medium",
     "category": "probability",
@@ -558,7 +558,7 @@
     "source": "Placement Test"
   },
   {
-    "puzzleId": 119,
+    "puzzleId": 50,
     "title": "Breaking Stick",
     "difficulty": "medium",
     "category": "probability",
@@ -569,7 +569,7 @@
     "source": "Quant Interview"
   },
   {
-    "puzzleId": 120,
+    "puzzleId": 51,
     "title": "Prisoner's Hat (multicolor)",
     "difficulty": "medium",
     "category": "strategy",
@@ -579,7 +579,7 @@
     "solution": "Call the first person in back of row the 100th prisoner. The 10 colours will be given codes from 0 to 9. The 100th prisoner will sum the numbers associated with the 99 colours he sees and will say the colour corresponding to it modulo 10. This is enough for 99th person. All he needs to do now is connect the dots, sum the number of hats he can see, calculate modulo 10, and compare it with what 100th prisoner said. This way all 99 prisoners will be saved, and 100th prisoner dies with probability 9/10."
   },
   {
-    "puzzleId": 121,
+    "puzzleId": 52,
     "title": "Rainbow Hats",
     "difficulty": "medium",
     "category": "strategy",
@@ -591,7 +591,7 @@
     "comment": "original: what's MY Hat Number"
   },
   {
-    "puzzleId": 122,
+    "puzzleId": 53,
     "title": "2 Equations & 3 Unknowns ",
     "difficulty": "medium",
     "category": "general",
@@ -602,7 +602,7 @@
     "source": "Quantnet Forums"
   },
   {
-    "puzzleId": 123,
+    "puzzleId": 54,
     "title": "Domino Covering",
     "difficulty": "medium",
     "category": "discrete",
@@ -613,7 +613,7 @@
     "source": "Martin Gardner"
   },
   {
-    "puzzleId": 124,
+    "puzzleId": 55,
     "title": "Fruit Magic",
     "difficulty": "medium",
     "category": "discrete",
@@ -623,7 +623,7 @@
     "solution": "Create the invariant function f(A,B,C) = (0A+1B+2C)mod3, this function remains constant during a collision. But f(13,15,17) = 1 is not same as any of final states f(45,0,0)=f(0,45,0)=f(0,0,45)=0. Hence this can not be done.\n\nA refreshment to this old trick was given by Aritro Pathak:\ncall the no of times apples are increased by 2 as A, bananas increased by 2 as B, and cherries increased by 2 as C. if we need 45 apples,total increments - decrements of apple = 32\nbut increments of apple = 2 * A;\nwhen ever 2 banana's are created, 1 Apple is lost, similarly for 2 cherries\ndecrements = B+C\n\nthus we have 2A-B-C=32, -2B+C+A=15, -2C+B+A=17. Subtract the last two to get 2=3 * (B-C) which is impossible. similar cases for when you want 45 of either cherries or bananas."
   },
   {
-    "puzzleId": 125,
+    "puzzleId": 56,
     "title": "Catching Ants",
     "difficulty": "medium",
     "category": "discrete",
@@ -633,7 +633,7 @@
     "solution": "To guarantee that the card encompasses at least 3 ants, we can separate the square into 25 smaller areas (squares of side 1/5 each). Applying the generalized Pigeon Hole Principle, we can show that at least one of the areas must have at least 3 ants. The card is large enough to cover any of the 25 smaller areas. Done!"
   },
   {
-    "puzzleId": 126,
+    "puzzleId": 57,
     "title": "Color Complex",
     "difficulty": "medium",
     "category": "discrete",
@@ -644,7 +644,7 @@
     "source": "Top Quant Interview"
   },
   {
-    "puzzleId": 127,
+    "puzzleId": 58,
     "title": "Light Bulbs in circle",
     "difficulty": "medium",
     "category": "discrete",
@@ -655,7 +655,7 @@
     "source": "P. Winkler"
   },
   {
-    "puzzleId": 128,
+    "puzzleId": 59,
     "title": "Chocolate Bar",
     "difficulty": "medium",
     "category": "discrete",
@@ -665,7 +665,7 @@
     "solution": "For a chocolate of size mxn, we need mn - 1 steps. By breaking an existing piece horizontally or vertically, we merely increase the total number of pieces by one. Starting from 1 piece, we need mn - 1 steps to get to mn pieces.\nAnother way to reach the same conclusion is to focus on \"bottom left corners of squares\": Keep the chocolate rectangle in front of you and start drawing lines corresponding to cuts. Each cut \"exposes\" one new bottom left corner of some square. Initially, only one square's bottom left corner is exposed. In the end, all mn squares have their bottom left corners exposed."
   },
   {
-    "puzzleId": 129,
+    "puzzleId": 60,
     "title": "Dead Men Walking",
     "difficulty": "medium",
     "category": "discrete",
@@ -676,7 +676,7 @@
     "source": "CSEblog"
   },
   {
-    "puzzleId": 130,
+    "puzzleId": 61,
     "title": "Square Infection",
     "difficulty": "medium",
     "category": "discrete",
@@ -687,7 +687,7 @@
     "source": "P. Winkler"
   },
   {
-    "puzzleId": 201,
+    "puzzleId": 62,
     "title": "Colored Runs of Cards",
     "difficulty": "hard",
     "category": "probability",
@@ -698,7 +698,7 @@
     "source": "Quantnet"
   },
   {
-    "puzzleId": 202,
+    "puzzleId": 63,
     "title": "Drunk Ant",
     "difficulty": "hard",
     "category": "probability",
@@ -709,7 +709,7 @@
     "source": "Quant Interview"
   },
   {
-    "puzzleId": 203,
+    "puzzleId": 64,
     "title": "Distance from North Pole",
     "difficulty": "hard",
     "category": "probability",
@@ -721,7 +721,7 @@
     "comment": "http://mathforum.org/kb/message.jspa?messageID=70921"
   },
   {
-    "puzzleId": 204,
+    "puzzleId": 65,
     "title": "Expected Breakup Length",
     "difficulty": "hard",
     "category": "probability",
@@ -732,7 +732,7 @@
     "source": "Quant Interview"
   },
   {
-    "puzzleId": 205,
+    "puzzleId": 66,
     "title": "Messing with Envelops",
     "difficulty": "hard",
     "category": "probability",
@@ -743,7 +743,7 @@
     "source": "CSEblog"
   },
   {
-    "puzzleId": 206,
+    "puzzleId": 67,
     "title": "Collecting Lucky coupons",
     "difficulty": "hard",
     "category": "probability",
@@ -754,7 +754,7 @@
     "source": "Quant Interview"
   },
   {
-    "puzzleId": 207,
+    "puzzleId": 68,
     "title": "The Noodles",
     "difficulty": "hard",
     "category": "probability",
@@ -764,7 +764,7 @@
     "solution": "First calculate expected number of loops:\nDenote X1 = identity variable, which takes value 1 every time a (long) noodle becomes a loop by connecting to its end, (if its own end is connected to some other noodle, then that other noodle's end will be considered). Thus, number of loops = X1 +...+ X100, thus, expected number of loops = E(X1) + ... + E(X100). This will give answer = 1/(2N-1) + 1/(2N-3) + ... + 1/3 + 1\nwhere N = 100. This formula can also be proved using induction.\n\nCalculating Probability of single large loop:\nIf you followed last result, this one is simple, this time all the identitiy variables are zero except last one. Thus probability is [1 - 1/(2N-1)] * [ 1 - 1/(2N-3)] * ... * [1-1/3]\n= Product ( i = 2 to N) [ (2i-2) / (2i-1)]"
   },
   {
-    "puzzleId": 208,
+    "puzzleId": 69,
     "title": "Distinct Number Draws",
     "difficulty": "hard",
     "category": "probability",
@@ -776,7 +776,7 @@
     "comment": "<-- Sterling number of second type"
   },
   {
-    "puzzleId": 209,
+    "puzzleId": 70,
     "title": "Greed for an ACE",
     "difficulty": "hard",
     "category": "probability",
@@ -786,7 +786,7 @@
     "solution": "Define X1,X2…X48, such that Xi = 1 if ith card turns over before 4 aces, 0 otherwise. Thus, total number of cards turned to see first ace = 1 + sum (Xi)\nusing linearity of expectation, E(X) = 1 + sum ( E(Xi))\nNow consider the ith card and the four aces, all the orders are equally likely: X,A,A,A,A Or A,X,A,A,A, or 3 others. They are equally likely when we have no knowledge about position of these Aces with respect of the deck. Hence we have 5 equally likely slots for ith card: 1 A 2 A 3 A 4 A 5. We are interested in 1st slot.\nHence E(Xi) = 1/5 for all i = 1 to 48\nThus E(X) = 1 + 48/5 = 53/5 = 10.6\n \nThis can be done by recursive equation  f(n) = (4/n) * 1 + ((n-4)/n) * (1+f(n-1)), where f(n)=expected cards to flip in a deck of n cards, but I definitely can't solve this without a computer.\n\nA shorter explanation is to consider the 52 cards uniformly distributed over (0,1), so on average they're at k/53 for k=1,2,3,…,52. The four aces are on average at 1/5, 2/5, 3/5, 4/5. So 0.2=k/53 implies k=10.6, done!"
   },
   {
-    "puzzleId": 210,
+    "puzzleId": 71,
     "title": "Random point on disk",
     "difficulty": "hard",
     "category": "probability",
@@ -800,7 +800,7 @@
     "source": "Quant Interview"
   },
   {
-    "puzzleId": 211,
+    "puzzleId": 72,
     "title": "Enclosing The Center",
     "difficulty": "hard",
     "category": "probability",
@@ -811,7 +811,7 @@
     "source": "a nice senior"
   },
   {
-    "puzzleId": 213,
+    "puzzleId": 73,
     "title": "Sum To One",
     "difficulty": "hard",
     "category": "probability",
@@ -821,7 +821,7 @@
     "solution": "Probability of more than n throws is equivalent to saying X1+..+Xn <=1, this is the volume of n dimensional symplex from origin, its volume is 1/n! and can be proved by induction. This can be used to calculate expected number of button presses, sum( 1/n! * n ) = sum( 1/(n-1)!) = e^1\n\nOtherwise, set up a (lag)differential equation for f(x), the expected number of draws needed for the sum to exceed x. For x=0,f(x)=1. For x>0, suppose a draw gave number t, then f(x)= 1 + integral (t=0 to x)f(x-t)dt, which is same as f(x) = 1 + integral(t=0 to x) f(t)dt, differentiate wrt x, we get f'(x) = 0 + f'(x). This has the solution f(x)=e^x and x=1 gives e.\nTo take derivative, we used  leibniz integral rule:\nd/dx  ( integral( a(x) to b(x) ) f(t) dt = f(b(x)) * b'(x) - f(a(x)) * a'(x) = f(x) * 1 - f(x) * 0 = f(x)"
   },
   {
-    "puzzleId": 215,
+    "puzzleId": 74,
     "title": "Random Walk",
     "difficulty": "hard",
     "category": "probability",
@@ -836,7 +836,7 @@
     "source": "Top Quant Interview"
   },
   {
-    "puzzleId": 216,
+    "puzzleId": 75,
     "title": "Left Some Candies",
     "difficulty": "hard",
     "category": "probability",
@@ -846,7 +846,7 @@
     "solution": "$\\dfrac{30}{60} \\cdot \\dfrac{20}{30}+\\dfrac{20}{60} \\cdot \\dfrac{30}{40} =\\dfrac{7}{12}$\n\nWe will reach this formula by considering the complete sequence of 60 candies. \n\nAny scenario that satisfies the given question will match one of the following two:\n\n1. The  $60^{\\text{th}}$ candy in this sequence is **green**, and some blue candy exists before this and after the last red candy.\n\n2. The $60^{\\text{th}}$ candy is **blue**, and some green candy exists before this and after the last red candy.\n\nIn the first scenario, let $G$ be the event that the  $60^{\\text{th}}$ candy is green. Let $B^*$ be the event that there is a blue candy before that but after the last red. Since these two events are not independent, we want to calculate:\n\n $P(G \\cap B^*) = P(G) \\cdot P(B^* | G)$\n\n$P(G) = 30/60$ because the $60^{\\text{th}}$ candy will be one of 30 greens, and there are a total of 60 choices.\n\n$P(B^* | G)$ is the probability of finding a blue candy after the last red, given that the $60^{\\text{th}}$ candy is green. Now remove all green candies from consideration, there are 30 candies (10 red & 20 blue). Imagine a random sequence of these 30 candies (it might be scattered anywhere from position 1 to $59$, but still, it is a random sequence of 30 candies only). The probability that the $30^{\\text{th}}$ one of these is blue is $20/30$.\n\nThus $P(G \\cap B^*) = (30/60) \\cdot (20/30)$.\n\n\nSimilarly, for the second scenario, let $B$ be the event that the $60^{\\text{th}}$ candy is blue and let $G^*$ be the event that there is a green candy before that but after the last red. We want to calculate $P(B \\cap G^*) = P(B) \\cdot P(G^* | B) = (20/60) \\cdot (30/40)$\n\nSince these two scenarios are mutually exclusive, the probability of union is the sum of these probabilities.\n\nHence the answer: $1/3 + 1/4 = 7/12$\n\n---\n\nNot convinced? Here is a simulation script that shows the probability converging to 7/12.\n\n[Colab Script](https://colab.research.google.com/gist/varun-seth/a10254682b88c22ae09e9ddf25d1dba6/puzzle_216_left_some_candies.ipynb#sandboxMode=true)"
   },
   {
-    "puzzleId": 217,
+    "puzzleId": 76,
     "title": "Catching the Submarine",
     "difficulty": "hard",
     "category": "strategy",
@@ -857,7 +857,7 @@
     "source": "Inspired from <a href=\"http://research.microsoft.com/en-us/um/people/leino/puzzles.html\">Rustan Leino</a>'s puzzle\n\n"
   },
   {
-    "puzzleId": 218,
+    "puzzleId": 77,
     "title": "Catching the Spy",
     "difficulty": "hard",
     "category": "strategy",
@@ -868,7 +868,7 @@
     "source": "Written Test; leino"
   },
   {
-    "puzzleId": 220,
+    "puzzleId": 78,
     "title": "Pure Gold",
     "difficulty": "hard",
     "category": "strategy",
@@ -879,7 +879,7 @@
     "source": "CSEblog"
   },
   {
-    "puzzleId": 221,
+    "puzzleId": 79,
     "title": "Game of Divisors",
     "difficulty": "deadly",
     "category": "strategy",
@@ -893,7 +893,7 @@
     "source": "Krishnamurthy Iyer"
   },
   {
-    "puzzleId": 222,
+    "puzzleId": 80,
     "title": "Counter Strike",
     "difficulty": "hard",
     "category": "strategy",
@@ -904,7 +904,7 @@
     "source": "Toad Puzzles"
   },
   {
-    "puzzleId": 223,
+    "puzzleId": 81,
     "title": "Sharing a Secret",
     "difficulty": "hard",
     "category": "discrete",
@@ -915,7 +915,7 @@
     "comment": "This was Screwy Pirates 2"
   },
   {
-    "puzzleId": 224,
+    "puzzleId": 82,
     "title": "Weights Reckoning",
     "difficulty": "hard",
     "category": "discrete",
@@ -926,7 +926,7 @@
     "source": "leino"
   },
   {
-    "puzzleId": 225,
+    "puzzleId": 83,
     "title": "Gas Stations on Circular Trek",
     "difficulty": "hard",
     "category": "discrete",
@@ -937,7 +937,7 @@
     "source": "P. Winkler"
   },
   {
-    "puzzleId": 226,
+    "puzzleId": 84,
     "title": "Bricking Box",
     "difficulty": "hard",
     "category": "discrete",
@@ -948,7 +948,7 @@
     "source": "Xinfeng Zhou"
   },
   {
-    "puzzleId": 1002,
+    "puzzleId": 85,
     "title": "To Begin or Not to begin?",
     "difficulty": "medium",
     "category": "probability",
@@ -960,7 +960,7 @@
     "comment": "ques 1, 40 prob puzzles"
   },
   {
-    "puzzleId": 1003,
+    "puzzleId": 86,
     "title": "Crazy Postman",
     "difficulty": "medium",
     "category": "probability",
@@ -971,7 +971,7 @@
     "source": "P. Winkler"
   },
   {
-    "puzzleId": 1004,
+    "puzzleId": 87,
     "title": "Single Bid",
     "difficulty": "medium",
     "category": "probability",
@@ -982,7 +982,7 @@
     "source": "P. Winkler"
   },
   {
-    "puzzleId": 1005,
+    "puzzleId": 88,
     "title": "Waiting for a Truck",
     "difficulty": "medium",
     "category": "probability",
@@ -992,7 +992,7 @@
     "solution": "Using memoryless property of exponential distribution, the expected waiting time is 10 minutes. This also holds backwards, hence the expected time last truck passed is also 10 minutes. But this does not violate the total inter-arrival time of 10 minutes, because if your car breaks at a random time, you are more likely to be in long interval than a short one. I don't have time today, remind me to post a more mathematical explanation."
   },
   {
-    "puzzleId": 1006,
+    "puzzleId": 89,
     "title": "The Blind Archer",
     "difficulty": "medium",
     "category": "probability",
@@ -1002,7 +1002,7 @@
     "solution": "Suppose x1, x2 and x3 are the distances of the arrows from center. As the archer is consistent, we can use symmetry, i.e., there are six equally likely cases: x1<x2<x3, (or 5 others, which are its permutations). Since archer is told that x1<x2, we are left with following equally likely cases:\nx1<x2<x3 , x2<x1<x3 , x1<x3<x2\nAmong these three, one is favorable. Hence The probability of last shot being best is 1/3.\n\nNotice that if there were (N-1) arrows, with first being better than rest, and then he shoots Nth arrow. The probability that Nth shot is best is 1/N."
   },
   {
-    "puzzleId": 1008,
+    "puzzleId": 90,
     "title": "Bullets of Fate",
     "difficulty": "deadly",
     "category": "probability",
@@ -1012,7 +1012,7 @@
     "solution": "I have tried the following scripts\n\n1. [Simulation Script](https://colab.research.google.com/gist/varun-seth/3bb3e08571d2b5ff4e3348ebb9ea5f4b/puzzle_1008_rdd_sim.ipynb#sandboxMode=true)\n2. [Brute Forcing Script](https://colab.research.google.com/gist/varun-seth/c57ed32726bf7492daa9dea375398c09/puzzle_1008_rdd_exact.ipynb#sandboxMode=true)\n3. [Simulation with Dynamic Programming](https://colab.research.google.com/gist/varun-seth/1b5c9f181e9f61850714af51d1737153/puzzle_1008_rdr_sim_dynamic.ipynb#sandboxMode=true)\n\nFollowing is the pattern.\n\n\n![plot1](/assets/images/1008_plot1.svg)\n\n![plot1](/assets/images/1008_plot2.svg)\n\n![plot1](/assets/images/1008_plot3.svg)\n\n\nIt appears to be moving towards 0.5 but I do not have any proof or any intuitive logic as to why.\n\nAlso, not sure why these waves appeared, and why the wavelength is expanding."
   },
   {
-    "puzzleId": 1009,
+    "puzzleId": 91,
     "title": "Clan Size",
     "difficulty": "deadly",
     "category": "probability",
@@ -1022,7 +1022,7 @@
     "solution": "This is more of a puzzle-to-ponder rather than a puzzle to learn. In my opinion, best estimator for average is sum( n )/ sum( #n/n), where #n is the number of people with clan size as 'n', and this sum is over all the values of 'n' we receive."
   },
   {
-    "puzzleId": 1011,
+    "puzzleId": 92,
     "title": "Min & Max",
     "difficulty": "medium",
     "category": "strategy",
@@ -1033,7 +1033,7 @@
     "source": "H. Cormen"
   },
   {
-    "puzzleId": 1012,
+    "puzzleId": 93,
     "title": "Prisoner's Hat (Infinity)",
     "difficulty": "deadly",
     "category": "strategy",
@@ -1043,7 +1043,7 @@
     "solution": "It uses Axiom of choice in a special way. Before night of execution, prisoners will create some equivalent classes among the set of all possible infinitely long binary strings. Let us say two infinite strings s1 and s2 are related, if they differ at finitely many places, and are same otherwise. This creates the equivalence relation. Thus they create all equivalence class. From each class, we mark one representative string. \n\nNow, a person pi looks ahead, and instantly knows his equivalent class & recalls the representative string S. When his turn comes, he speaks the ith digit of S as his guess. Since S and actual (current) string only differ upto a finite (say N) number of position. Thus only atmost N people may die using this technique.\n\nNow, first person will count number of places S differs from current string, and answer it in modulo 2. Based on answer of first person, second person can deduce his hat color. now the third person can deduce his color and so on. Except possibly for the first person, everyone will guess correctly."
   },
   {
-    "puzzleId": 1013,
+    "puzzleId": 94,
     "title": "Crazy Clock",
     "difficulty": "medium",
     "category": "discrete",
@@ -1054,7 +1054,7 @@
     "source": "Self"
   },
   {
-    "puzzleId": 1014,
+    "puzzleId": 95,
     "title": "Candy Game",
     "difficulty": "medium",
     "category": "discrete",
@@ -1065,7 +1065,7 @@
     "source": "puzzletweeter"
   },
   {
-    "puzzleId": 1015,
+    "puzzleId": 96,
     "title": "Overlapping Coins",
     "difficulty": "medium",
     "category": "discrete",
@@ -1076,7 +1076,7 @@
     "source": "CSEblog"
   },
   {
-    "puzzleId": 1016,
+    "puzzleId": 97,
     "title": "Scaling a Square",
     "difficulty": "medium",
     "category": "discrete",
@@ -1087,7 +1087,7 @@
     "source": "Saurabh Joshi's Blog"
   },
   {
-    "puzzleId": 1017,
+    "puzzleId": 98,
     "title": "Consecutive sums",
     "difficulty": "hard",
     "category": "discrete",
@@ -1098,7 +1098,7 @@
     "source": "Arthur Engel"
   },
   {
-    "puzzleId": 1018,
+    "puzzleId": 99,
     "title": "Intersecting Pillars",
     "difficulty": "hard",
     "category": "discrete",
@@ -1108,7 +1108,7 @@
     "solution": "If you cut the intersection by a horizontal plane at distance z from center, the cut will be a square with side-length 2 * sqrt( 1-z^2). Integrate to get volume 16/3.\n\nAnother way is to imagine the largest possible sphere inscribed at the center of intersection. The sphere should have a radius of 1. At each cut perpendicular to the z-axis, the circle from the sphere is inscribed in the square from the intersection as well, So Area of cut-circle = (Pi/4) * Area of cut-square. This is true for all z, hence Volume of sphere = (Pi/4) * Volume of Intersection, this also gives 16/3"
   },
   {
-    "puzzleId": 1019,
+    "puzzleId": 100,
     "title": "Weird Sequences",
     "difficulty": "medium",
     "category": "general",
@@ -1119,7 +1119,7 @@
     "source": "Common"
   },
   {
-    "puzzleId": 1020,
+    "puzzleId": 101,
     "title": "Color Switches",
     "difficulty": "hard",
     "category": "probability",

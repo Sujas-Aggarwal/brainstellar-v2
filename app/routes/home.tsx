@@ -227,6 +227,7 @@ export default function Home() {
           <div className="flex-1 relative group">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--muted-fg)]" />
             <input
+              id="search-input"
               type="text"
               placeholder="SEARCH INTERVIEW PUZZLES (PROBABILITY, MATH, CODING...)"
               value={searchQuery}
@@ -244,6 +245,7 @@ export default function Home() {
             {categories.map((cat) => (
               <button
                 key={cat}
+                id={`cat-filter-${cat.toLowerCase().replace(/\s+/g, '-')}`}
                 onClick={() => handleCategorySelect(cat)}
                 className={`px-5 py-3 text-[10px] font-bold uppercase tracking-widest border transition-all whitespace-nowrap ${
                   selectedCategory.toLowerCase() === cat.toLowerCase() 
@@ -264,6 +266,7 @@ export default function Home() {
               {difficulties.map((diff) => (
                 <button
                   key={diff}
+                  id={`diff-filter-${diff.toLowerCase()}`}
                   onClick={() => handleDifficultySelect(diff)}
                   className={`text-[10px] font-bold uppercase tracking-[0.15em] transition-all relative py-1 ${
                     selectedDifficulty.toLowerCase() === diff.toLowerCase() 
@@ -278,6 +281,7 @@ export default function Home() {
           </div>
 
           <button
+            id="starred-filter-toggle"
             onClick={() => setShowFavorites(!showFavorites)}
             className={`text-[10px] font-bold uppercase tracking-[0.15em] px-6 py-2 border transition-all ${
               showFavorites 
