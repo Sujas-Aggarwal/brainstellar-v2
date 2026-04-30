@@ -11,7 +11,7 @@ export function Navbar() {
         <div className="flex items-center gap-2">
           <Link to="/" className="flex items-center gap-2 group">
             <span className="text-sm font-bold uppercase tracking-tighter">
-              Brainfuck
+              Brain<strong className="text-red-500">f</strong>uck
             </span>
           </Link>
         </div>

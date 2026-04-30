@@ -3,6 +3,15 @@ import { ChevronLeft, MessageCircle, MessageSquare } from "lucide-react";
 import { Link } from "react-router";
 import { useState } from "react";
 import { Comments } from "~/components/Comments";
+import type { Route } from "./+types/discuss";
+
+export const meta: Route.MetaFunction = () => [
+  { title: "Puzzle Discussion Forum | Brainfuck" },
+  { name: "description", content: "Join the Brainfuck community to discuss interview puzzles, share solutions, and prepare for Quant, HFT, and SDE roles." },
+  { property: "og:title", content: "Puzzle Discussion Forum | Brainfuck" },
+  { property: "og:url", content: "https://brainfuck.site/discuss" },
+  { rel: "canonical", href: "https://brainfuck.site/discuss" },
+];
 
 export default function Discuss() {
   const [showComments, setShowComments] = useState(false);

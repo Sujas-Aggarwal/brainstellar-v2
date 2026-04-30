@@ -31,6 +31,11 @@ export const meta: Route.MetaFunction = ({ data }) => {
       name: "keywords",
       content: `puzzles for interview, interview puzzles, ${puzzle.title} solution, ${puzzle.category} puzzles, ${puzzle.difficulty} logic puzzles, Brainstellar puzzles, quant interview questions`,
     },
+    { property: "og:title", content: `${puzzle.title} | Interview Puzzle Solution` },
+    { property: "og:description", content: `Step-by-step solution for ${puzzle.title}. A ${puzzle.difficulty} level ${puzzle.category} puzzle for interview prep.` },
+    { property: "og:url", content: `https://brainfuck.site/puzzles/${puzzle.puzzleId}` },
+    { property: "og:type", content: "article" },
+    { rel: "canonical", href: `https://brainfuck.site/puzzles/${puzzle.puzzleId}` },
   ];
 };
 

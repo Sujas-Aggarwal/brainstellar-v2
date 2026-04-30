@@ -2,7 +2,7 @@ import type { LoaderFunctionArgs } from "react-router";
 import puzzles from "../data/puzzles.json";
 
 export async function loader({ request }: LoaderFunctionArgs) {
-  const baseUrl = "https://brainfuck.sujas.me";
+  const baseUrl = "https://brainfuck.site";
 
   const categories = Array.from(new Set(puzzles.map((p: any) => p.category?.toLowerCase()))).filter(Boolean);
   const difficulties = Array.from(new Set(puzzles.map((p: any) => p.difficulty?.toLowerCase()))).filter(Boolean);

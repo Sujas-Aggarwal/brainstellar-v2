@@ -10,7 +10,9 @@ export function Footer() {
     <footer className="border-t border-[var(--border)] bg-[var(--bg)] pt-20 pb-32 px-6">
       <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between gap-16">
         <div className="space-y-6">
-          <div className="text-xl font-bold tracking-tighter uppercase">Brainfuck</div>
+          <div className="text-xl font-bold tracking-tighter uppercase">
+              Brain<strong className="text-red-500">f</strong>uck
+          </div>
           <p className="text-xs font-bold text-[var(--muted-fg)] uppercase tracking-[0.3em] max-w-xs leading-relaxed">
             100+ Free high-quality logic puzzles for Quant, HFT, and SDE interviews.
           </p>

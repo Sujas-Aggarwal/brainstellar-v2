@@ -22,7 +22,7 @@ export const meta: Route.MetaFunction = () => [
   { property: "og:title", content: "Brainfuck | 100+ Free Interview Puzzles" },
   { property: "og:description", content: "Free, high-quality logic puzzles for Quant, HFT, and Tech interviews. 100+ problems with detailed solutions." },
   { property: "og:type", content: "website" },
-  { property: "og:url", content: "https://brainfuck.sujas.me" },
+  { property: "og:url", content: "https://brainfuck.site" },
   { name: "twitter:card", content: "summary_large_image" },
   { name: "twitter:title", content: "Brainfuck | 100+ Free Interview Puzzles" },
   { name: "twitter:description", content: "Master the puzzles asked in top-tier interviews. 100% free, high-fidelity solutions." },
@@ -54,7 +54,7 @@ export const links: Route.LinksFunction = () => [
   },
   {
     rel: "canonical",
-    href: "https://brainfuck.sujas.me",
+    href: "https://brainfuck.site",
   },
 ];
 
@@ -67,6 +67,23 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <Meta />
         <Links />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "WebSite",
+              "name": "Brainfuck",
+              "url": "https://brainfuck.site",
+              "description": "Access 100+ high-quality logic puzzles for free. Prepare for Quant, HFT, and SDE interviews.",
+              "potentialAction": {
+                "@type": "SearchAction",
+                "target": "https://brainfuck.site/?q={search_term_string}",
+                "query-input": "required name=search_term_string"
+              }
+            }),
+          }}
+        />
       </head>
       <body>
         {children}

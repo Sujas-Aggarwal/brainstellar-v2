@@ -2,6 +2,16 @@ import { Navbar } from "~/components/Navbar";
 import { ChevronLeft, Send } from "lucide-react";
 import { Link } from "react-router";
 
+import type { Route } from "./+types/submit";
+
+export const meta: Route.MetaFunction = () => [
+  { title: "Submit a Puzzle | Brainfuck" },
+  { name: "description", content: "Contribute to the Brainfuck archive. Submit high-quality logic puzzles for Quant, HFT, and SDE interview preparation." },
+  { property: "og:title", content: "Submit a Puzzle | Brainfuck" },
+  { property: "og:url", content: "https://brainfuck.site/submit" },
+  { rel: "canonical", href: "https://brainfuck.site/submit" },
+];
+
 export default function Submit() {
   return (
     <div className="pt-24 pb-32 px-6 max-w-4xl mx-auto min-h-screen bg-[var(--bg)] text-[var(--fg)]">

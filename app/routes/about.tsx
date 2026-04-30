@@ -7,6 +7,10 @@ export const meta: Route.MetaFunction = () => [
   { title: "Free Interview Puzzle Preparation | Brainfuck" },
   { name: "description", content: "Access 100+ free logic puzzles for Quant, HFT, and SDE interviews. Detailed solutions and community discussions for top tech job preparation." },
   { name: "keywords", content: "free interview puzzles, brainstellar, interview puzzles, puzzle questions for interview, puzzles asked in interviews, quant interview puzzles, HFT interview questions, SDE puzzles, coding interview brain teasers, maths puzzles for developers, programmer brain teasers, tech job puzzles" },
+  { property: "og:title", content: "Free Interview Puzzle Preparation | Brainfuck" },
+  { property: "og:description", content: "Learn more about Brainfuck, the ultimate free resource for Quant, HFT, and SDE interview puzzles." },
+  { property: "og:url", content: "https://brainfuck.site/about" },
+  { rel: "canonical", href: "https://brainfuck.site/about" },
 ];
 
 export default function About() {

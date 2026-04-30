@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect } from "react";
+import { useSearchParams } from "react-router";
 import { useUser } from "~/contexts/UserContext";
 import puzzlesData from "~/data/puzzles.json";
 import { Navbar } from "~/components/Navbar";
@@ -17,6 +18,8 @@ export const meta: Route.MetaFunction = ({ params }: { params: any }) => {
     { name: "description", content: `Prepare for Quant, HFT, and SDE interviews with 100+ free ${topic} puzzles. High-quality solutions and tracking for top tech job interviews.` },
     { name: "keywords", content: `puzzles for interview, brainstellar, interview puzzles, puzzle questions for interview, puzzles asked in interviews, ${topic} puzzles, tech job puzzles` },
     { property: "og:title", title },
+    { property: "og:url", content: "https://brainfuck.site" },
+    { rel: "canonical", href: "https://brainfuck.site" },
     { name: "robots", content: "index, follow" },
   ];
 };
@@ -69,7 +72,9 @@ export default function Home() {
   const params = useParams();
   const navigate = useNavigate();
   const { solvedPuzzles, favoritePuzzles } = useUser();
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchParams, setSearchParams] = useSearchParams();
+  const initialQuery = searchParams.get("q") || "";
+  const [searchQuery, setSearchQuery] = useState(initialQuery);
   
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [selectedDifficulty, setSelectedDifficulty] = useState("All");
@@ -159,13 +164,13 @@ export default function Home() {
     "@type": "CollectionPage",
     "name": "Interview Puzzles Archive",
     "description": "A collection of 100+ free high-quality logic puzzles for Quant, HFT, and SDE interviews.",
-    "url": "https://brainfuck.sujas.me",
+    "url": "https://brainfuck.site",
     "mainEntity": {
       "@type": "ItemList",
       "itemListElement": filteredPuzzles.slice(0, 10).map((p, i) => ({
         "@type": "ListItem",
         "position": i + 1,
-        "url": `https://brainfuck.sujas.me/puzzles/${p.puzzleId}`,
+        "url": `https://brainfuck.site/puzzles/${p.puzzleId}`,
         "name": p.title
       }))
     }
@@ -225,7 +230,12 @@ export default function Home() {
               type="text"
               placeholder="SEARCH INTERVIEW PUZZLES (PROBABILITY, MATH, CODING...)"
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={(e) => {
+                const val = e.target.value;
+                setSearchQuery(val);
+                if (val) setSearchParams({ q: val }, { replace: true });
+                else setSearchParams({}, { replace: true });
+              }}
               className="w-full bg-[var(--bg)] border border-[var(--border)] px-12 py-4 text-xs font-bold uppercase tracking-widest outline-none focus:border-[var(--fg)] transition-all placeholder:text-[var(--muted-fg)]"
             />
           </div>
@@ -249,8 +259,8 @@ export default function Home() {
 
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 py-6 border-y border-[var(--border)]">
           <div className="flex items-center gap-8">
-            <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-[var(--muted-fg)]">Difficulty:</span>
-            <div className="flex gap-8">
+            <span className="text-[10px] font-bold ml-2  uppercase tracking-[0.15em] text-[var(--muted-fg)]">Difficulty:</span>
+            <div className="flex gap-8 flex-wrap">
               {difficulties.map((diff) => (
                 <button
                   key={diff}
