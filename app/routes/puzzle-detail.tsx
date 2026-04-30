@@ -57,6 +57,14 @@ export default function PuzzleDetail({
   const isSolved = solvedPuzzles.includes(puzzle.puzzleId);
   const isFavorite = favoritePuzzles.includes(puzzle.puzzleId);
 
+  // Reset visibility states when puzzle changes
+  useEffect(() => {
+    setShowSolution(false);
+    setShowHint(false);
+    setShowAnswer(false);
+    setShowComments(false);
+  }, [puzzle.puzzleId]);
+
   const prevPuzzle = puzzlesData.find(
     (p) => p.puzzleId === puzzle.puzzleId - 1,
   );
