@@ -9,7 +9,8 @@ import {
   doc, 
   getDoc, 
   setDoc, 
-  onSnapshot 
+  onSnapshot,
+  serverTimestamp 
 } from "firebase/firestore";
 import { auth, db, googleProvider } from "~/lib/firebase";
 
@@ -27,8 +28,6 @@ interface UserContextType extends UserData {
   toggleSolved: (id: number) => void;
   toggleFavorite: (id: number) => void;
   toggleTheme: () => void;
-  exportData: () => void;
-  importData: (data: string) => boolean;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -44,84 +43,139 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     theme: "dark",
   });
 
-  // Listen for auth state changes
+  // Load data from localStorage on initial mount
   useEffect(() => {
-    console.log("Setting up Auth listener...");
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      console.log("Auth state changed:", currentUser?.email || "No user");
-      setUser(currentUser);
-      setLoading(false);
-    }, (error) => {
-      console.error("Auth listener error:", error);
-      setLoading(false);
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        setData(prev => ({
+          ...prev,
+          solvedPuzzles: parsed.solvedPuzzles || [],
+          favoritePuzzles: parsed.favoritePuzzles || [],
+          theme: parsed.theme || "dark"
+        }));
+        if (parsed.theme === "dark") {
+          document.documentElement.classList.add("dark");
+        } else if (parsed.theme === "light") {
+          document.documentElement.classList.remove("dark");
+        }
+      } catch (e) {
+        console.error("Failed to parse saved data", e);
+      }
+    }
+  }, []);
+
+  // Listen for auth state changes and handle merging
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+      console.log("Auth state changed:", currentUser?.email || "Guest");
+      
+      if (currentUser) {
+        // User logged in: Handle merging
+        const userDocRef = doc(db, "users", currentUser.uid);
+        const userDoc = await getDoc(userDocRef);
+        
+        // Current state (potentially from guest session)
+        const localData = {
+          solvedPuzzles: data.solvedPuzzles,
+          favoritePuzzles: data.favoritePuzzles
+        };
+
+        if (userDoc.exists()) {
+          const cloudData = userDoc.data() as Partial<UserData>;
+          console.log("Existing cloud data found, merging...");
+          
+          // Merge: Unique IDs from both sources
+          const mergedSolved = Array.from(new Set([...(cloudData.solvedPuzzles || []), ...localData.solvedPuzzles]));
+          const mergedFavorites = Array.from(new Set([...(cloudData.favoritePuzzles || []), ...localData.favoritePuzzles]));
+
+          const finalData = {
+            solvedPuzzles: mergedSolved,
+            favoritePuzzles: mergedFavorites,
+            email: currentUser.email,
+            displayName: currentUser.displayName,
+            lastLogin: serverTimestamp(),
+          };
+
+          await setDoc(userDocRef, finalData, { merge: true });
+          setData(prev => ({ 
+            ...prev, 
+            solvedPuzzles: mergedSolved, 
+            favoritePuzzles: mergedFavorites 
+          }));
+        } else {
+          console.log("No cloud data, uploading local progress...");
+          await setDoc(userDocRef, {
+            ...localData,
+            email: currentUser.email,
+            displayName: currentUser.displayName,
+            createdAt: serverTimestamp(),
+          });
+        }
+        
+        // After merge, setup real-time listener for this user
+        const unsubSnapshot = onSnapshot(userDocRef, (doc) => {
+          if (doc.exists()) {
+            const latestData = doc.data() as Partial<UserData>;
+            setData(prev => ({
+              ...prev,
+              solvedPuzzles: latestData.solvedPuzzles || [],
+              favoritePuzzles: latestData.favoritePuzzles || [],
+            }));
+          }
+        });
+
+        setUser(currentUser);
+        setLoading(false);
+        return () => unsubSnapshot();
+      } else {
+        // Guest mode: Load from localStorage
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) {
+          try {
+            const parsed = JSON.parse(saved);
+            setData(prev => ({ 
+              ...prev, 
+              solvedPuzzles: parsed.solvedPuzzles || [], 
+              favoritePuzzles: parsed.favoritePuzzles || [] 
+            }));
+          } catch (e) {
+            console.error("Failed to parse saved data", e);
+          }
+        } else {
+          // Reset to clean slate if no local storage
+          setData(prev => ({ ...prev, solvedPuzzles: [], favoritePuzzles: [] }));
+        }
+        setUser(null);
+        setLoading(false);
+      }
     });
     return () => unsubscribe();
   }, []);
 
-  // Sync with Firestore if logged in, otherwise localStorage
+  // Persist guest data to localStorage whenever it changes
   useEffect(() => {
-    if (user) {
-      console.log("Syncing with Firestore for user:", user.uid);
-      const userDocRef = doc(db, "users", user.uid);
-      const unsubscribe = onSnapshot(userDocRef, (doc) => {
-        if (doc.exists()) {
-          const userData = doc.data() as Partial<UserData>;
-          console.log("Firestore data received:", userData);
-          setData(prev => ({
-            ...prev,
-            solvedPuzzles: userData.solvedPuzzles || [],
-            favoritePuzzles: userData.favoritePuzzles || [],
-          }));
-        } else {
-          console.log("No user doc found, creating one...");
-          // Initialize user doc if it doesn't exist
-          setDoc(userDocRef, {
-            solvedPuzzles: data.solvedPuzzles,
-            favoritePuzzles: data.favoritePuzzles,
-            email: user.email,
-            displayName: user.displayName,
-          }, { merge: true }).catch(err => console.error("Error creating user doc:", err));
-        }
-      }, (error) => {
-        console.error("Firestore sync error:", error);
-      });
-      return () => unsubscribe();
-    } else {
-      console.log("No user, loading from localStorage...");
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) {
-        try {
-          const parsed = JSON.parse(saved);
-          setData(prev => ({ ...prev, ...parsed }));
-        } catch (e) {
-          console.error("Failed to parse saved data", e);
-        }
-      }
+    if (!user && !loading) {
+      console.log("Saving guest data to localStorage...");
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
     }
-  }, [user]);
-
-  // Persist local changes to storage/firestore
-  useEffect(() => {
-    if (!user) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify({
-        solvedPuzzles: data.solvedPuzzles,
-        favoritePuzzles: data.favoritePuzzles,
-        theme: data.theme
-      }));
-    } else {
-      const userDocRef = doc(db, "users", user.uid);
-      setDoc(userDocRef, {
-        solvedPuzzles: data.solvedPuzzles,
-        favoritePuzzles: data.favoritePuzzles,
-      }, { merge: true }).catch(err => console.error("Error updating user doc:", err));
-    }
-
+    
+    // Theme application (always runs)
     if (data.theme === "dark") {
       document.documentElement.classList.add("dark");
     } else {
       document.documentElement.classList.remove("dark");
     }
-  }, [data, user]);
+  }, [data, user, loading]);
+
+  // Sync actions to the correct source
+  const syncToCloud = async (newData: Partial<UserData>) => {
+    if (user) {
+      const userDocRef = doc(db, "users", user.uid);
+      await setDoc(userDocRef, newData, { merge: true });
+    }
+  };
 
   const signIn = async () => {
     console.log("Initiating Google Sign-In...");
@@ -143,49 +197,34 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const toggleSolved = (id: number) => {
-    setData(prev => ({
-      ...prev,
-      solvedPuzzles: prev.solvedPuzzles.includes(id)
-        ? prev.solvedPuzzles.filter(p => p !== id)
-        : [...prev.solvedPuzzles, id]
-    }));
+  const toggleSolved = async (id: number) => {
+    const isSolved = data.solvedPuzzles.includes(id);
+    const newSolved = isSolved
+      ? data.solvedPuzzles.filter(p => p !== id)
+      : [...data.solvedPuzzles, id];
+
+    setData(prev => ({ ...prev, solvedPuzzles: newSolved }));
+    
+    if (user) {
+      await syncToCloud({ solvedPuzzles: newSolved });
+    }
   };
 
-  const toggleFavorite = (id: number) => {
-    setData(prev => ({
-      ...prev,
-      favoritePuzzles: prev.favoritePuzzles.includes(id)
-        ? prev.favoritePuzzles.filter(p => p !== id)
-        : [...prev.favoritePuzzles, id]
-    }));
+  const toggleFavorite = async (id: number) => {
+    const isFav = data.favoritePuzzles.includes(id);
+    const newFav = isFav
+      ? data.favoritePuzzles.filter(p => p !== id)
+      : [...data.favoritePuzzles, id];
+
+    setData(prev => ({ ...prev, favoritePuzzles: newFav }));
+
+    if (user) {
+      await syncToCloud({ favoritePuzzles: newFav });
+    }
   };
 
   const toggleTheme = () => {
     setData(prev => ({ ...prev, theme: prev.theme === "light" ? "dark" : "light" }));
-  };
-
-  const exportData = () => {
-    const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `brainfuck_v2_progress_${new Date().toISOString().split('T')[0]}.json`;
-    a.click();
-    URL.revokeObjectURL(url);
-  };
-
-  const importData = (jsonString: string) => {
-    try {
-      const imported = JSON.parse(jsonString);
-      if (Array.isArray(imported.solvedPuzzles) && Array.isArray(imported.favoritePuzzles)) {
-        setData(prev => ({ ...prev, ...imported }));
-        return true;
-      }
-    } catch (e) {
-      console.error("Import failed", e);
-    }
-    return false;
   };
 
   return (
@@ -197,9 +236,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
       signOut,
       toggleSolved, 
       toggleFavorite,
-      toggleTheme,
-      exportData,
-      importData
+      toggleTheme
     }}>
       <div className="theme-transition min-h-screen bg-[var(--bg)] text-[var(--fg)]">
         {children}

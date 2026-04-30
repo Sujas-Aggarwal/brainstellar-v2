@@ -5,22 +5,6 @@ import { Download, Upload } from "lucide-react";
 
 export function Footer() {
   const currentYear = new Date().getFullYear();
-  const { exportData, importData } = useUser();
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const handleImport = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        const content = event.target?.result as string;
-        if (importData(content)) {
-          alert("Progress Imported Successfully.");
-        }
-      };
-      reader.readAsText(file);
-    }
-  };
 
   return (
     <footer className="border-t border-[var(--border)] bg-[var(--bg)] pt-20 pb-32 px-6">
@@ -52,21 +36,10 @@ export function Footer() {
           </div>
 
           <div className="space-y-6">
-            <h4 className="text-[10px] font-bold uppercase tracking-[0.4em] text-[var(--fg)]">Progress Sync</h4>
+            <h4 className="text-[10px] font-bold uppercase tracking-[0.4em] text-[var(--fg)]">SEO</h4>
             <ul className="space-y-4 text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--muted-fg)]">
-              <li>
-                <button onClick={exportData} className="flex items-center gap-2 hover:text-[var(--fg)] transition-colors">
-                  <Download className="w-3 h-3" />
-                  Export Data
-                </button>
-              </li>
-              <li>
-                <input type="file" ref={fileInputRef} onChange={handleImport} className="hidden" accept=".json" />
-                <button onClick={() => fileInputRef.current?.click()} className="flex items-center gap-2 hover:text-[var(--fg)] transition-colors">
-                  <Upload className="w-3 h-3" />
-                  Import Data
-                </button>
-              </li>
+              <li><a href="/sitemap.xml" target="_blank" className="hover:text-[var(--fg)] transition-colors">Sitemap</a></li>
+              <li><a href="/robots.txt" target="_blank" className="hover:text-[var(--fg)] transition-colors">Robots</a></li>
             </ul>
           </div>
         </div>
