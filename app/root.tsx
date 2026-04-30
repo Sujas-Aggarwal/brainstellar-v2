@@ -99,7 +99,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
     return;
   }
 
-  var target = "https://brainfuck.site";
+  var target = "https://www.brainfuck.site";
   var img = new Image();
   var done = false;
 
@@ -126,7 +126,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
   // ⚡ aggressive cutoff (tuned sweet spot)
   setTimeout(function () {
     finish(false);
-  }, 500);
+  }, 300);
 
   // fire ASAP
   img.src = target + "/ping.png?" + Date.now();
