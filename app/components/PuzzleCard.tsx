@@ -36,7 +36,7 @@ export function PuzzleCard({ puzzle, isSolved }: PuzzleCardProps) {
             onClick={(e) => { e.preventDefault(); toggleFavorite(puzzle.puzzleId); }}
             className={clsx("transition-colors p-1 -m-1", isFavorite ? "text-[var(--fg)]" : "text-[var(--muted-fg)] hover:text-[var(--fg)]")}
           >
-            <Heart className={clsx("w-3.5 h-3.5", isFavorite && "fill-[var(--fg)]")} />
+            <Heart className={clsx("w-3.5 h-3.5", isFavorite && "fill-[var(--c-deadly)] text-[var(--c-deadly)]")} />
           </button>
         </div>
 
@@ -52,11 +52,11 @@ export function PuzzleCard({ puzzle, isSolved }: PuzzleCardProps) {
         <div className="flex items-center justify-between pt-4 mt-auto">
           <div className="flex items-center gap-2">
             {isSolved ? (
-              <CheckCircle2 className="w-3.5 h-3.5 text-[var(--fg)]" />
+              <CheckCircle2 className="w-3.5 h-3.5 text-(--c-easy)" />
             ) : (
               <Circle className="w-3.5 h-3.5 text-[var(--muted-fg)]/30" />
             )}
-            <span className={clsx("text-[10px] font-bold uppercase tracking-[0.1em]", isSolved ? "text-[var(--fg)]" : "text-[var(--muted-fg)]")}>
+            <span className={clsx("text-[10px] font-bold uppercase tracking-[0.1em]", isSolved ? "text-(--c-easy)" : "text-[var(--muted-fg)]")}>
               {isSolved ? "Solved" : "Unsolved"}
             </span>
           </div>

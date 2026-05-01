@@ -9,7 +9,7 @@ import {
 } from "react-router";
 import { useState, useEffect } from "react";
 import { useLocation } from "react-router";
-import { ExternalLink, Globe, ShieldAlert, X } from "lucide-react";
+import { ExternalLink, Globe, X } from "lucide-react";
 import { initPostHog, trackEvent } from "~/lib/posthog";
 
 import type { Route } from "./+types/root";
@@ -76,6 +76,8 @@ export const links: Route.LinksFunction = () => [
     rel: "preconnect",
     href: "https://www.brainfuck.online",
   },
+  { rel: "icon", type: "image/x-icon", href: "/favicon.ico" },
+  { rel: "icon", type: "image/png", href: "/favicon.png" },
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {
@@ -117,8 +119,6 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
 export default function App() {
   const [showMigrationModal, setShowMigrationModal] = useState(false);
-  const [isAvailable, setIsAvailable] = useState<boolean | null>(null);
-  const [checking, setChecking] = useState(false);
 
   const location = useLocation();
 
@@ -132,7 +132,6 @@ export default function App() {
 
   useEffect(() => {
     const hostname = window.location.hostname;
-    const targetDomain = "www.brainfuck.online";
 
     // Show migration modal if on legacy domain or for testing
     if (
@@ -142,31 +141,8 @@ export default function App() {
       hostname.includes("localhost")
     ) {
       setShowMigrationModal(true);
-      checkConnectivity();
     }
   }, []);
-
-  const checkConnectivity = () => {
-    setChecking(true);
-    const img = new Image();
-    const timeout = setTimeout(() => {
-      setIsAvailable(false);
-      setChecking(false);
-    }, 5000);
-
-    img.onload = () => {
-      clearTimeout(timeout);
-      setIsAvailable(true);
-      setChecking(false);
-    };
-    img.onerror = () => {
-      clearTimeout(timeout);
-      setIsAvailable(false);
-      setChecking(false);
-    };
-    // Ping the site image with a cache-buster
-    img.src = `https://www.brainfuck.online/ping.png?t=${Date.now()}`;
-  };
 
   return (
     <UserProvider>
@@ -199,51 +175,16 @@ export default function App() {
                 <p className="text-sm font-medium leading-relaxed text-(--muted-fg)">
                   Brainfuck is evolving. We are moving our entire puzzle archive to our new permanent home at <span className="text-(--fg) font-bold">brainfuck.online</span>.
                 </p>
-                
-                <div className="p-6 border border-(--border) bg-(--muted)/30 rounded-xl space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-[10px] font-bold uppercase tracking-widest text-(--muted-fg)">
-                      Network Status
-                    </span>
-                    {checking ? (
-                      <span className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-(--muted-fg)">
-                        <div className="w-1.5 h-1.5 rounded-full bg-(--muted-fg) animate-pulse" />
-                        Verifying...
-                      </span>
-                    ) : isAvailable ? (
-                      <span className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-(--c-easy)">
-                        <div className="w-1.5 h-1.5 rounded-full bg-(--c-easy)" />
-                        Available
-                      </span>
-                    ) : (
-                      <span className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-(--c-deadly)">
-                        <div className="w-1.5 h-1.5 rounded-full bg-(--c-deadly)" />
-                        Blocked
-                      </span>
-                    )}
-                  </div>
-                  
-                  {!checking && isAvailable === false && (
-                    <div className="flex gap-3 text-xs font-bold text-(--c-deadly) items-start">
-                      <ShieldAlert className="w-4 h-4 shrink-0" />
-                      <p className="uppercase tracking-tight leading-tight">
-                        It seems our new domain is currently unavailable on your local network. You can stay here for now.
-                      </p>
-                    </div>
-                  )}
-                </div>
               </div>
 
               <div className="flex flex-col sm:flex-row gap-4 pt-4">
-                {isAvailable && (
-                  <a
-                    href="https://www.brainfuck.online"
-                    className="flex-1 flex items-center justify-center gap-2 bg-(--fg) text-(--bg) px-8 py-4 text-[10px] font-bold uppercase tracking-widest hover:opacity-90 transition-all shadow-xl shadow-(--fg)/10"
-                  >
-                    Go to brainfuck.online
-                    <ExternalLink className="w-3.5 h-3.5" />
-                  </a>
-                )}
+                <a
+                  href="https://www.brainfuck.online"
+                  className="flex-1 flex items-center justify-center gap-2 bg-(--fg) text-(--bg) px-8 py-4 text-[10px] font-bold uppercase tracking-widest hover:opacity-90 transition-all shadow-xl shadow-(--fg)/10"
+                >
+                  Go to brainfuck.online
+                  <ExternalLink className="w-3.5 h-3.5" />
+                </a>
                 <button
                   onClick={() => setShowMigrationModal(false)}
                   className="flex-1 border border-(--border) text-(--muted-fg) px-8 py-4 text-[10px] font-bold uppercase tracking-widest hover:text-(--fg) hover:border-(--fg) transition-all"

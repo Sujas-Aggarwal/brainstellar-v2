@@ -11,7 +11,13 @@ import type { Route } from "./+types/home";
 import Fuse from "fuse.js";
 
 export const meta: Route.MetaFunction = ({ params }: { params: any }) => {
-  const topic = (params as any).category || (params as any).difficulty || "Archive";
+  let topic = "Archive";
+  if ((params as any).category) topic = (params as any).category;
+  else if ((params as any).difficulty) topic = (params as any).difficulty;
+  else if ((params as any).filter) {
+    topic = `Solved ${(params as any).filter === 'all' ? '' : (params as any).filter}`;
+  }
+  
   const title = `100+ Free ${topic} Puzzles | Interview Prep`;
   return [
     { title },
@@ -28,14 +34,21 @@ export async function loader() {
   return {};
 }
 
-function ProgressCircle({ current, total, label, icon: Icon, colorVar }: { current: number; total: number; label: string; icon: any; colorVar: string }) {
+function ProgressCircle({ current, total, label, icon: Icon, colorVar, onClick, isActive }: { current: number; total: number; label: string; icon: any; colorVar: string; onClick?: () => void; isActive?: boolean }) {
   const percentage = total > 0 ? Math.round((current / total) * 100) : 0;
   const radius = 28;
   const circumference = 2 * Math.PI * radius;
   const offset = circumference - (percentage / 100) * circumference;
 
   return (
-    <div className="flex flex-col items-center gap-3 p-6 border border-[var(--border)] group hover:border-[var(--fg)] transition-all bg-[var(--bg)] relative overflow-hidden">
+    <button 
+      onClick={onClick}
+      className={`flex flex-col items-center gap-3 p-6 border group transition-all relative overflow-hidden text-center w-full ${
+        isActive 
+          ? "border-[var(--fg)] bg-[var(--fg)]/5" 
+          : "border-[var(--border)] bg-[var(--bg)] hover:border-[var(--fg)]"
+      }`}
+    >
       {percentage > 0 && (
         <div 
           className="absolute inset-0 opacity-[0.03] transition-opacity group-hover:opacity-[0.07]"
@@ -57,14 +70,14 @@ function ProgressCircle({ current, total, label, icon: Icon, colorVar }: { curre
           <Icon className="w-4 h-4 transition-colors" style={{ color: percentage > 0 ? `var(${colorVar})` : 'var(--muted-fg)' }} />
         </div>
       </div>
-      <div className="text-center z-10">
+      <div className="z-10">
         <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--muted-fg)]">{label}</div>
         <div className="text-sm font-black tracking-tighter">
           {current}<span className="opacity-20 mx-0.5">/</span>{total}
         </div>
         <div className="text-[10px] font-black mt-1" style={{ color: `var(${colorVar})` }}>{percentage}%</div>
       </div>
-    </div>
+    </button>
   );
 }
 
@@ -78,15 +91,29 @@ export default function Home() {
   
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [selectedDifficulty, setSelectedDifficulty] = useState("All");
+  const [showOnlySolved, setShowOnlySolved] = useState(false);
   const [showFavorites, setShowFavorites] = useState(false);
 
   useEffect(() => {
-    if (params.category) setSelectedCategory(params.category);
-    else if (!params.difficulty) setSelectedCategory("All");
-
-    if (params.difficulty) setSelectedDifficulty(params.difficulty);
-    else if (!params.category) setSelectedDifficulty("All");
-  }, [params.category, params.difficulty]);
+    if (params.category) {
+      setSelectedCategory(params.category);
+      setSelectedDifficulty("All");
+      setShowOnlySolved(false);
+    } else if (params.difficulty) {
+      setSelectedDifficulty(params.difficulty);
+      setSelectedCategory("All");
+      setShowOnlySolved(false);
+    } else if (params.filter) {
+      setShowOnlySolved(true);
+      setSelectedCategory("All");
+      const diff = params.filter.charAt(0).toUpperCase() + params.filter.slice(1);
+      setSelectedDifficulty(diff === "All" ? "All" : diff);
+    } else {
+      setSelectedCategory("All");
+      setSelectedDifficulty("All");
+      setShowOnlySolved(false);
+    }
+  }, [params]);
 
   const categories = useMemo(() => ["All", ...new Set(puzzlesData.map(p => p.category))], []);
   const difficulties = ["All", "Easy", "Medium", "Hard", "Deadly"];
@@ -144,9 +171,10 @@ export default function Home() {
       const matchesCategory = selectedCategory === "All" || p.category.toLowerCase() === selectedCategory.toLowerCase();
       const matchesDifficulty = selectedDifficulty === "All" || p.difficulty.toLowerCase() === selectedDifficulty.toLowerCase();
       const matchesFavorites = !showFavorites || favoritePuzzles.includes(p.puzzleId);
-      return matchesCategory && matchesDifficulty && matchesFavorites;
+      const matchesSolved = !showOnlySolved || solvedPuzzles.includes(p.puzzleId);
+      return matchesCategory && matchesDifficulty && matchesFavorites && matchesSolved;
     });
-  }, [searchQuery, selectedCategory, selectedDifficulty, showFavorites, favoritePuzzles, fuse]);
+  }, [searchQuery, selectedCategory, selectedDifficulty, showFavorites, showOnlySolved, favoritePuzzles, solvedPuzzles, fuse]);
 
   const handleCategorySelect = (cat: string) => {
     if (cat === "All") navigate("/");
@@ -156,6 +184,14 @@ export default function Home() {
   const handleDifficultySelect = (diff: string) => {
     if (diff === "All") navigate("/");
     else navigate(`/difficulty/${diff.toLowerCase()}`);
+  };
+
+  const handleSolvedSelect = (filter: string) => {
+    if (showOnlySolved && selectedDifficulty.toLowerCase() === filter.toLowerCase()) {
+      navigate("/");
+    } else {
+      navigate(`/solved/${filter.toLowerCase()}`);
+    }
   };
 
   // Structured Data for SEO with official domain
@@ -214,11 +250,31 @@ export default function Home() {
         </div>
 
         <div className="grid grid-cols-2 lg:grid-cols-5 gap-px bg-[var(--border)] border border-[var(--border)]">
-          <ProgressCircle current={stats.solved} total={stats.total} label="All Puzzles" icon={Trophy} colorVar="--c-overall" />
-          <ProgressCircle current={stats.byDifficulty.easy.solved} total={stats.byDifficulty.easy.total} label="Easy" icon={Target} colorVar="--c-easy" />
-          <ProgressCircle current={stats.byDifficulty.medium.solved} total={stats.byDifficulty.medium.total} label="Medium" icon={Zap} colorVar="--c-medium" />
-          <ProgressCircle current={stats.byDifficulty.hard.solved} total={stats.byDifficulty.hard.total} label="Hard" icon={Flame} colorVar="--c-hard" />
-          <ProgressCircle current={stats.byDifficulty.deadly.solved} total={stats.byDifficulty.deadly.total} label="Deadly" icon={Skull} colorVar="--c-deadly" />
+          <ProgressCircle 
+            current={stats.solved} total={stats.total} label="All Puzzles" icon={Trophy} colorVar="--c-overall" 
+            onClick={() => handleSolvedSelect("all")}
+            isActive={showOnlySolved && selectedDifficulty === "All"}
+          />
+          <ProgressCircle 
+            current={stats.byDifficulty.easy.solved} total={stats.byDifficulty.easy.total} label="Easy" icon={Target} colorVar="--c-easy" 
+            onClick={() => handleSolvedSelect("easy")}
+            isActive={showOnlySolved && selectedDifficulty === "Easy"}
+          />
+          <ProgressCircle 
+            current={stats.byDifficulty.medium.solved} total={stats.byDifficulty.medium.total} label="Medium" icon={Zap} colorVar="--c-medium" 
+            onClick={() => handleSolvedSelect("medium")}
+            isActive={showOnlySolved && selectedDifficulty === "Medium"}
+          />
+          <ProgressCircle 
+            current={stats.byDifficulty.hard.solved} total={stats.byDifficulty.hard.total} label="Hard" icon={Flame} colorVar="--c-hard" 
+            onClick={() => handleSolvedSelect("hard")}
+            isActive={showOnlySolved && selectedDifficulty === "Hard"}
+          />
+          <ProgressCircle 
+            current={stats.byDifficulty.deadly.solved} total={stats.byDifficulty.deadly.total} label="Deadly" icon={Skull} colorVar="--c-deadly" 
+            onClick={() => handleSolvedSelect("deadly")}
+            isActive={showOnlySolved && selectedDifficulty === "Deadly"}
+          />
         </div>
       </section>
 

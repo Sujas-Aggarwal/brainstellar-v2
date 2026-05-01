@@ -8,6 +8,7 @@ export default [
   route("about", "routes/about.tsx"),
   route("discuss", "routes/discuss.tsx"),
   route("submit", "routes/submit.tsx"),
+  route("solved/:filter", "routes/solved.tsx"),
   route("sitemap.xml", "routes/sitemap.tsx"),
   route("*", "routes/not-found.tsx"),
 ] satisfies RouteConfig;
