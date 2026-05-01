@@ -81,6 +81,8 @@ function ProgressCircle({ current, total, label, icon: Icon, colorVar, onClick, 
   );
 }
 
+const PAGE_SIZE = 24;
+
 export default function Home() {
   const params = useParams();
   const navigate = useNavigate();
@@ -88,11 +90,12 @@ export default function Home() {
   const [searchParams, setSearchParams] = useSearchParams();
   const initialQuery = searchParams.get("q") || "";
   const [searchQuery, setSearchQuery] = useState(initialQuery);
-  
+
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [selectedDifficulty, setSelectedDifficulty] = useState("All");
   const [showOnlySolved, setShowOnlySolved] = useState(false);
   const [showFavorites, setShowFavorites] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
     if (params.category) {
@@ -175,6 +178,17 @@ export default function Home() {
       return matchesCategory && matchesDifficulty && matchesFavorites && matchesSolved;
     });
   }, [searchQuery, selectedCategory, selectedDifficulty, showFavorites, showOnlySolved, favoritePuzzles, solvedPuzzles, fuse]);
+
+  // Reset to page 1 whenever filters or search change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, selectedCategory, selectedDifficulty, showFavorites, showOnlySolved]);
+
+  const totalPages = Math.max(1, Math.ceil(filteredPuzzles.length / PAGE_SIZE));
+  const paginatedPuzzles = useMemo(
+    () => filteredPuzzles.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE),
+    [filteredPuzzles, currentPage]
+  );
 
   const handleCategorySelect = (cat: string) => {
     if (cat === "All") navigate("/");
@@ -290,6 +304,7 @@ export default function Home() {
               onChange={(e) => {
                 const val = e.target.value;
                 setSearchQuery(val);
+                setCurrentPage(1);
                 if (val) setSearchParams({ q: val }, { replace: true });
                 else setSearchParams({}, { replace: true });
               }}
@@ -350,13 +365,86 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Puzzle grid — current page only */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 border-l border-t border-[var(--border)]">
-        {filteredPuzzles.map((puzzle) => (
+        {paginatedPuzzles.map((puzzle) => (
           <div key={puzzle.puzzleId} className="border-r border-b border-[var(--border)]">
             <PuzzleCard puzzle={puzzle} isSolved={solvedPuzzles.includes(puzzle.puzzleId)} />
           </div>
         ))}
       </div>
+
+      {/* Pagination controls */}
+      {totalPages > 1 && (
+        <div className="mt-12 flex items-center justify-between border-t border-[var(--border)] pt-8">
+          {/* Left: result count */}
+          <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--muted-fg)]">
+            {filteredPuzzles.length} puzzle{filteredPuzzles.length !== 1 ? "s" : ""}
+            {" "}&mdash;{" "}
+            page {currentPage} of {totalPages}
+          </span>
+
+          {/* Right: prev / page numbers / next */}
+          <div className="flex items-center gap-2">
+            <button
+              id="pagination-prev"
+              disabled={currentPage === 1}
+              onClick={() => { setCurrentPage(p => p - 1); window.scrollTo({ top: 0, behavior: "smooth" }); }}
+              className="px-4 py-2 text-[10px] font-bold uppercase tracking-widest border border-[var(--border)] text-[var(--muted-fg)] hover:border-[var(--fg)] hover:text-[var(--fg)] transition-all disabled:opacity-25 disabled:cursor-not-allowed"
+            >
+              ← Prev
+            </button>
+
+            {/* Page number buttons — show at most 7 pages with ellipsis */}
+            {(() => {
+              const pages: (number | "...")[] = [];
+              if (totalPages <= 7) {
+                for (let i = 1; i <= totalPages; i++) pages.push(i);
+              } else {
+                pages.push(1);
+                if (currentPage > 3) pages.push("...");
+                for (let i = Math.max(2, currentPage - 1); i <= Math.min(totalPages - 1, currentPage + 1); i++) pages.push(i);
+                if (currentPage < totalPages - 2) pages.push("...");
+                pages.push(totalPages);
+              }
+              return pages.map((p, idx) =>
+                p === "..." ? (
+                  <span key={`ellipsis-${idx}`} className="px-2 text-[10px] text-[var(--muted-fg)]">…</span>
+                ) : (
+                  <button
+                    key={p}
+                    id={`pagination-page-${p}`}
+                    onClick={() => { setCurrentPage(p as number); window.scrollTo({ top: 0, behavior: "smooth" }); }}
+                    className={`w-9 h-9 text-[10px] font-bold uppercase tracking-widest border transition-all ${
+                      currentPage === p
+                        ? "bg-[var(--fg)] text-[var(--bg)] border-[var(--fg)]"
+                        : "border-[var(--border)] text-[var(--muted-fg)] hover:border-[var(--fg)] hover:text-[var(--fg)]"
+                    }`}
+                  >
+                    {p}
+                  </button>
+                )
+              );
+            })()}
+
+            <button
+              id="pagination-next"
+              disabled={currentPage === totalPages}
+              onClick={() => { setCurrentPage(p => p + 1); window.scrollTo({ top: 0, behavior: "smooth" }); }}
+              className="px-4 py-2 text-[10px] font-bold uppercase tracking-widest border border-[var(--border)] text-[var(--muted-fg)] hover:border-[var(--fg)] hover:text-[var(--fg)] transition-all disabled:opacity-25 disabled:cursor-not-allowed"
+            >
+              Next →
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Result count when only 1 page */}
+      {totalPages === 1 && filteredPuzzles.length > 0 && (
+        <p className="mt-8 text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--muted-fg)]">
+          {filteredPuzzles.length} puzzle{filteredPuzzles.length !== 1 ? "s" : ""} found
+        </p>
+      )}
     </div>
   );
 }
