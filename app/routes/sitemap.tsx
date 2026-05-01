@@ -54,6 +54,19 @@ export async function loader({ request }: LoaderFunctionArgs) {
   </url>`
     )
     .join("")}
+  <url>
+    <loc>${baseUrl}/solved/all</loc>
+    <priority>0.5</priority>
+  </url>
+  ${difficulties
+    .map(
+      (difficulty) => `
+  <url>
+    <loc>${baseUrl}/solved/${encodeURIComponent(difficulty)}</loc>
+    <priority>0.5</priority>
+  </url>`
+    )
+    .join("")}
 </urlset>`;
 
   return new Response(sitemap, {

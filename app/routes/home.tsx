@@ -45,8 +45,8 @@ function ProgressCircle({ current, total, label, icon: Icon, colorVar, onClick, 
       onClick={onClick}
       className={`flex flex-col items-center gap-3 p-6 border group transition-all relative overflow-hidden text-center w-full ${
         isActive 
-          ? "border-[var(--fg)] bg-[var(--fg)]/5" 
-          : "border-[var(--border)] bg-[var(--bg)] hover:border-[var(--fg)]"
+          ? "border-(--fg) bg-(--fg)/5" 
+          : "border-(--border) bg-(--bg) hover:border-(--fg)"
       }`}
     >
       {percentage > 0 && (
