@@ -14,7 +14,7 @@ interface PuzzleCardProps {
 }
 
 export function PuzzleCard({ puzzle, isSolved }: PuzzleCardProps) {
-  const { favoritePuzzles, toggleFavorite } = useUser();
+  const { favoritePuzzles, toggleFavorite, toggleSolved } = useUser();
   const isFavorite = favoritePuzzles.includes(puzzle.puzzleId);
 
   return (
@@ -50,16 +50,26 @@ export function PuzzleCard({ puzzle, isSolved }: PuzzleCardProps) {
         </div>
 
         <div className="flex items-center justify-between pt-4 mt-auto">
-          <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleSolved(puzzle.puzzleId); }}
+            aria-pressed={isSolved}
+            aria-label={isSolved ? "Mark as unsolved" : "Mark as solved"}
+            title={isSolved ? "Mark as unsolved" : "Mark as solved"}
+            className={clsx(
+              "flex items-center gap-2 rounded-md px-2 py-1 text-[10px] font-bold uppercase tracking-[0.1em] transition-colors",
+              isSolved
+                ? "text-(--c-easy) hover:bg-[var(--muted)]/40"
+                : "text-[var(--muted-fg)] hover:text-[var(--fg)] hover:bg-[var(--muted)]/40"
+            )}
+          >
             {isSolved ? (
-              <CheckCircle2 className="w-3.5 h-3.5 text-(--c-easy)" />
+              <CheckCircle2 className="w-3.5 h-3.5" />
             ) : (
               <Circle className="w-3.5 h-3.5 text-[var(--muted-fg)]/30" />
             )}
-            <span className={clsx("text-[10px] font-bold uppercase tracking-[0.1em]", isSolved ? "text-(--c-easy)" : "text-[var(--muted-fg)]")}>
-              {isSolved ? "Solved" : "Unsolved"}
-            </span>
-          </div>
+            <span>{isSolved ? "Solved" : "Unsolved"}</span>
+          </button>
           <span className="text-[10px] font-bold uppercase tracking-[0.1em] text-[var(--muted-fg)] group-hover:text-[var(--fg)] transition-colors">
             Open
           </span>
