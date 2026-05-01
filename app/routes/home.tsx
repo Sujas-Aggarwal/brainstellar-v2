@@ -192,11 +192,13 @@ export default function Home() {
   const desktopPages = useMemo(() => {
     const pages: (number | "...")[] = [];
     if (totalPages <= 7) {
-      for (let i = 1; i <= totalPages; i++) pages.push(i);
+      for (let pageNumber = 1; pageNumber <= totalPages; pageNumber++) pages.push(pageNumber);
     } else {
       pages.push(1);
       if (currentPage > 3) pages.push("...");
-      for (let i = Math.max(2, currentPage - 1); i <= Math.min(totalPages - 1, currentPage + 1); i++) pages.push(i);
+      for (let pageNumber = Math.max(2, currentPage - 1); pageNumber <= Math.min(totalPages - 1, currentPage + 1); pageNumber++) {
+        pages.push(pageNumber);
+      }
       if (currentPage < totalPages - 2) pages.push("...");
       pages.push(totalPages);
     }
@@ -205,7 +207,7 @@ export default function Home() {
   const mobilePages = useMemo(() => {
     const pages: (number | "...")[] = [];
     if (totalPages <= 3) {
-      for (let i = 1; i <= totalPages; i++) pages.push(i);
+      for (let pageNumber = 1; pageNumber <= totalPages; pageNumber++) pages.push(pageNumber);
       return pages;
     }
     pages.push(1);
