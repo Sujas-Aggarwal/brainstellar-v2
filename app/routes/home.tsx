@@ -189,6 +189,35 @@ export default function Home() {
     () => filteredPuzzles.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE),
     [filteredPuzzles, currentPage]
   );
+  const desktopPages = useMemo(() => {
+    const pages: (number | "...")[] = [];
+    if (totalPages <= 7) {
+      for (let pageNumber = 1; pageNumber <= totalPages; pageNumber++) pages.push(pageNumber);
+    } else {
+      pages.push(1);
+      if (currentPage > 3) pages.push("...");
+      for (let pageNumber = Math.max(2, currentPage - 1); pageNumber <= Math.min(totalPages - 1, currentPage + 1); pageNumber++) {
+        pages.push(pageNumber);
+      }
+      if (currentPage < totalPages - 2) pages.push("...");
+      pages.push(totalPages);
+    }
+    return pages;
+  }, [currentPage, totalPages]);
+  const mobilePages = useMemo(() => {
+    const pages: (number | "...")[] = [];
+    if (totalPages <= 3) {
+      for (let pageNumber = 1; pageNumber <= totalPages; pageNumber++) pages.push(pageNumber);
+      return pages;
+    }
+    pages.push(1);
+    if (currentPage > 2) pages.push("...");
+    const middle = currentPage === 1 ? 2 : currentPage === totalPages ? totalPages - 1 : currentPage;
+    if (middle > 1 && middle < totalPages) pages.push(middle);
+    if (currentPage < totalPages - 1) pages.push("...");
+    pages.push(totalPages);
+    return pages;
+  }, [currentPage, totalPages]);
 
   const handleCategorySelect = (cat: string) => {
     if (cat === "All") navigate("/");
@@ -395,21 +424,31 @@ export default function Home() {
               ← Prev
             </button>
 
-            {/* Page number buttons — show at most 7 pages with ellipsis */}
-            {(() => {
-              const pages: (number | "...")[] = [];
-              if (totalPages <= 7) {
-                for (let i = 1; i <= totalPages; i++) pages.push(i);
-              } else {
-                pages.push(1);
-                if (currentPage > 3) pages.push("...");
-                for (let i = Math.max(2, currentPage - 1); i <= Math.min(totalPages - 1, currentPage + 1); i++) pages.push(i);
-                if (currentPage < totalPages - 2) pages.push("...");
-                pages.push(totalPages);
-              }
-              return pages.map((p, idx) =>
+            {/* Page number buttons — compact on mobile */}
+            <div className="flex items-center gap-2 sm:hidden">
+              {mobilePages.map((p, idx) =>
                 p === "..." ? (
-                  <span key={`ellipsis-${idx}`} className="px-2 text-[10px] text-[var(--muted-fg)]">…</span>
+                  <span key={`ellipsis-mobile-${idx}`} className="px-2 text-[10px] text-[var(--muted-fg)]">…</span>
+                ) : (
+                  <button
+                    key={`mobile-${p}`}
+                    id={`pagination-page-mobile-${p}`}
+                    onClick={() => { setCurrentPage(p as number); window.scrollTo({ top: 0, behavior: "smooth" }); }}
+                    className={`w-9 h-9 text-[10px] font-bold uppercase tracking-widest border transition-all ${
+                      currentPage === p
+                        ? "bg-[var(--fg)] text-[var(--bg)] border-[var(--fg)]"
+                        : "border-[var(--border)] text-[var(--muted-fg)] hover:border-[var(--fg)] hover:text-[var(--fg)]"
+                    }`}
+                  >
+                    {p}
+                  </button>
+                )
+              )}
+            </div>
+            <div className="hidden sm:flex items-center gap-2">
+              {desktopPages.map((p, idx) =>
+                p === "..." ? (
+                  <span key={`ellipsis-desktop-${idx}`} className="px-2 text-[10px] text-[var(--muted-fg)]">…</span>
                 ) : (
                   <button
                     key={p}
@@ -424,8 +463,8 @@ export default function Home() {
                     {p}
                   </button>
                 )
-              );
-            })()}
+              )}
+            </div>
 
             <button
               id="pagination-next"
