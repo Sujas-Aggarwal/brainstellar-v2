@@ -10,8 +10,12 @@ export const initPostHog = () => {
     if (key && host) {
       posthog.init(key, {
         api_host: host,
-        person_profiles: 'identified_only', // or 'always' if you want to track guests
-        capture_pageview: false, // We'll handle this manually for SPA transitions
+        person_profiles: 'identified_only',
+        capture_pageview: false, // We handle this manually for SPA transitions
+        // Disable session recording on all pages (prevents loading posthog-recorder.js ~47KiB)
+        disable_session_recording: ['.*'] as unknown as boolean,
+        // Disable surveys (prevents loading surveys.js ~32KiB)
+        disable_surveys: true,
       });
     }
   }

@@ -72,6 +72,8 @@ export const links: Route.LinksFunction = () => [
     href: "https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css",
   },
   { rel: "canonical", href: "https://www.brainfuck.online" },
+  // Lighthouse-flagged: preconnect to Firebase/Google APIs saves ~300ms LCP
+  { rel: "preconnect", href: "https://apis.google.com" },
   { rel: "icon", type: "image/x-icon", href: "/favicon.ico" },
   { rel: "icon", type: "image/png", href: "/favicon.png" },
 ];
