@@ -405,7 +405,7 @@ export default function Home() {
 
       {/* Pagination controls */}
       {totalPages > 1 && (
-        <div className="mt-12 flex items-center justify-between border-t border-[var(--border)] pt-8">
+        <div className="mt-12 flex flex-col gap-4 border-t border-[var(--border)] pt-8 sm:flex-row sm:items-center sm:justify-between">
           {/* Left: result count */}
           <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--muted-fg)]">
             {filteredPuzzles.length} puzzle{filteredPuzzles.length !== 1 ? "s" : ""}
@@ -414,7 +414,7 @@ export default function Home() {
           </span>
 
           {/* Right: prev / page numbers / next */}
-          <div className="flex items-center gap-2">
+          <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto sm:flex-nowrap">
             <button
               id="pagination-prev"
               disabled={currentPage === 1}
