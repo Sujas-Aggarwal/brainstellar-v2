@@ -6,11 +6,9 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
+  useLocation,
 } from "react-router";
 import { useState, useEffect } from "react";
-import { useLocation } from "react-router";
-import { ExternalLink, Globe, X } from "lucide-react";
-import { initPostHog, trackEvent } from "~/lib/posthog";
 
 import type { Route } from "./+types/root";
 import { UserProvider } from "./contexts/UserContext";
@@ -54,31 +52,61 @@ export const meta: Route.MetaFunction = () => [
 ];
 
 export const links: Route.LinksFunction = () => [
+  // Preconnect to font origins
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
   {
     rel: "preconnect",
     href: "https://fonts.gstatic.com",
     crossOrigin: "anonymous",
   },
+  // Non-render-blocking font load (preload → swap to stylesheet via JS in Layout)
   {
-    rel: "stylesheet",
+    rel: "preload",
+    as: "style",
     href: "https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap",
   },
+  // Non-render-blocking KaTeX (same preload trick)
   {
-    rel: "stylesheet",
+    rel: "preload",
+    as: "style",
     href: "https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css",
   },
-  {
-    rel: "canonical",
-    href: "https://www.brainfuck.online",
-  },
-  {
-    rel: "preconnect",
-    href: "https://www.brainfuck.online",
-  },
+  { rel: "canonical", href: "https://www.brainfuck.online" },
   { rel: "icon", type: "image/x-icon", href: "/favicon.ico" },
   { rel: "icon", type: "image/png", href: "/favicon.png" },
 ];
+
+// Inline SVGs for the migration modal – avoids importing lucide-react in root
+const IconGlobe = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <circle cx="12" cy="12" r="10" />
+    <line x1="2" y1="12" x2="22" y2="12" />
+    <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+  </svg>
+);
+const IconExternalLink = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+    <polyline points="15 3 21 3 21 9" />
+    <line x1="10" y1="14" x2="21" y2="3" />
+  </svg>
+);
+const IconX = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <line x1="18" y1="6" x2="6" y2="18" />
+    <line x1="6" y1="6" x2="18" y2="18" />
+  </svg>
+);
+
+// Script that converts preload links to actual stylesheets without blocking render
+const NON_BLOCKING_STYLE_SCRIPT = `
+(function(){
+  var links=document.querySelectorAll('link[rel="preload"][as="style"]');
+  for(var i=0;i<links.length;i++){
+    links[i].rel='stylesheet';
+  }
+})();
+`;
 
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
@@ -88,7 +116,8 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <Meta />
         <Links />
-
+        {/* Activate preloaded stylesheets without blocking render */}
+        <script dangerouslySetInnerHTML={{ __html: NON_BLOCKING_STYLE_SCRIPT }} />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
@@ -122,18 +151,30 @@ export default function App() {
 
   const location = useLocation();
 
+  // Defer PostHog entirely until the browser is idle so it never blocks paint
   useEffect(() => {
-    initPostHog();
+    const load = () =>
+      import("~/lib/posthog").then(({ initPostHog, trackEvent }) => {
+        initPostHog();
+        trackEvent("$pageview");
+      });
+
+    if (typeof requestIdleCallback !== "undefined") {
+      requestIdleCallback(load, { timeout: 3000 });
+    } else {
+      setTimeout(load, 1000);
+    }
   }, []);
 
+  // Track subsequent page views after navigation
   useEffect(() => {
-    trackEvent('$pageview');
-  }, [location]);
+    import("~/lib/posthog").then(({ trackEvent }) => {
+      trackEvent("$pageview");
+    });
+  }, [location.pathname]);
 
   useEffect(() => {
     const hostname = window.location.hostname;
-
-    // Show migration modal if on legacy domain or for testing
     if (
       hostname.includes("sujas.me") ||
       hostname.includes("brainfuck.site") ||
@@ -149,17 +190,17 @@ export default function App() {
       <Outlet />
       <Footer />
 
-      {/* Migration Modal */}
+      {/* Migration Modal – only rendered on legacy domains */}
       {showMigrationModal && (
         <div className="fixed inset-0 z-9999 flex items-center justify-center p-6 bg-(--bg)/80 backdrop-blur-xl animate-in fade-in duration-500">
           <div className="w-full max-w-lg bg-(--bg) border border-(--border) shadow-2xl overflow-hidden relative group">
             {/* Accent Bar */}
             <div className="h-1.5 w-full bg-linear-to-r from-(--c-hard) via-(--c-overall) to-(--c-easy)" />
-            
+
             <div className="p-8 sm:p-12 space-y-8">
               <div className="flex items-center gap-4">
-                <div className="p-3 bg-(--muted) rounded-2xl">
-                  <Globe className="w-6 h-6 text-(--fg)" />
+                <div className="p-3 bg-(--muted) rounded-2xl text-(--fg)">
+                  <IconGlobe />
                 </div>
                 <div className="space-y-1">
                   <h2 className="text-2xl font-black uppercase tracking-tighter leading-none">
@@ -173,7 +214,8 @@ export default function App() {
 
               <div className="space-y-4">
                 <p className="text-sm font-medium leading-relaxed text-(--muted-fg)">
-                  Brainfuck is evolving. We are moving our entire puzzle archive to our new permanent home at <span className="text-(--fg) font-bold">brainfuck.online</span>.
+                  Brainfuck is evolving. We are moving our entire puzzle archive to our new permanent home at{" "}
+                  <span className="text-(--fg) font-bold">brainfuck.online</span>.
                 </p>
               </div>
 
@@ -183,7 +225,7 @@ export default function App() {
                   className="flex-1 flex items-center justify-center gap-2 bg-(--fg) text-(--bg) px-8 py-4 text-[10px] font-bold uppercase tracking-widest hover:opacity-90 transition-all shadow-xl shadow-(--fg)/10"
                 >
                   Go to brainfuck.online
-                  <ExternalLink className="w-3.5 h-3.5" />
+                  <IconExternalLink />
                 </a>
                 <button
                   onClick={() => setShowMigrationModal(false)}
@@ -194,11 +236,11 @@ export default function App() {
               </div>
             </div>
 
-            <button 
+            <button
               onClick={() => setShowMigrationModal(false)}
               className="absolute top-6 right-6 p-2 text-[var(--muted-fg)] hover:text-[var(--fg)] transition-colors"
             >
-              <X className="w-4 h-4" />
+              <IconX />
             </button>
           </div>
         </div>
